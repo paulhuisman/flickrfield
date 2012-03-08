@@ -20,11 +20,11 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dr
 * https://github.com/GCX/acf-address-field/zipball/master or  
 * git clone git://github.com/GCX/acf-taxonomy-field.git acf-ddress-field  
 
-2. Include the address-field.php file:
+2.Include the address-field.php file:
 
 `include_once( rtrim( dirname( __FILE__ ), '/' ) . '/acf-address-field/address-field.php' );`
 
-3. Register the field 
+3.Register the field 
 
 register_field($name, $path). Where $path is the direct path to your theme (add-on subdirectory optional)
 
