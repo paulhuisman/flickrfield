@@ -24,9 +24,9 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dr
 
 register_field($name, $path). Where $path is the direct path to your theme (add-on subdirectory optional)
 
-	`if(function_exists('register_field')) {    
+	if(function_exists('register_field')) {    
 		register_field('flickr_set', dirname(__File__) . '/your-ACF-addon-subdirectory/flickr_set/flickr_set.php');  
-	}`  
+	}  
 
 ## Changelog
 
