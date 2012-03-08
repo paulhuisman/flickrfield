@@ -4,9 +4,11 @@
 	// Get Flickr set ID, Api Key and User ID
 	$flickr_set = get_field('flickr_set');
 	
-	// Require phpFlickr library
+	// Require and initialize phpFlickr library
 	require_once(dirname(__FILE__) . '/flickr_set/phpFlickr.php');
 	$f = new phpFlickr($flickr_set['api_key']);
+	
+	// Enable the phpFlickr cache - make sure the folder cache is properly placed
 	$f->enableCache("f", dirname(__FILE__) . '/flickr_set/cache');
 	
 	// Get all photos that are part of the given set ID
