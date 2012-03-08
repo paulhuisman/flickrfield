@@ -16,9 +16,9 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dr
 
 ## Installation
 
-1.Download or clone the acf-address-field repo to your plugin or theme:
-* https://github.com/GCX/acf-address-field/zipball/master or
-* git clone git://github.com/GCX/acf-taxonomy-field.git acf-ddress-field
+1.Download or clone the acf-address-field repo to your plugin or theme:  
+* https://github.com/GCX/acf-address-field/zipball/master or  
+* git clone git://github.com/GCX/acf-taxonomy-field.git acf-ddress-field  
 
 2. Include the address-field.php file:
 
@@ -28,10 +28,9 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dr
 
 register_field($name, $path). Where $path is the direct path to your theme (add-on subdirectory optional)
 
-`if(function_exists('register_field'))
-{
-	register_field('flickr_set', dirname(__File__) . '/your-ACF-addon-subdirectory/flickr_set.php');
-}`
+`if(function_exists('register_field')) {    
+	register_field('flickr_set', dirname(__File__) . '/your-ACF-addon-subdirectory/flickr_set.php');  
+}`  
 
 ## Changelog
 
