@@ -30,4 +30,4 @@ register_field($name, $path). Where $path is the direct path to your theme (add-
 
 ## More documentatieon
 
-* Check out ([paulhuisman-online.nl](http://www.paulhuisman-online.nl/fresh-look/flickr-field)) for more documentation on how to use this custom field for ACF.
+* Check out ([my personal website](http://www.paulhuisman-online.nl/fresh-look/flickr-field)) for more documentation on how to use this custom field for ACF.
