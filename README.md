@@ -28,10 +28,6 @@ register_field($name, $path). Where $path is the direct path to your theme (add-
 		register_field('flickr_set', dirname(__File__) . '/your-ACF-addon-subdirectory/flickr_set/flickr_set.php');  
 	}  
 
-## Changelog
+## More documentatieon
 
-= 1.0 =
-* Initial setup.
-
-## To Do
-- Also cache retrieved sets in a wp_transient.
+* Check out ([paulhuisman-online.nl](http://www.paulhuisman-online.nl/fresh-look/flickr-field)) for more documentation on how to use this custom field for ACF.
