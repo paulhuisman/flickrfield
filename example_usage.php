@@ -4,6 +4,7 @@ $flickr_set = get_field('flickr_set');
 
 // Check if an set or gallery ID exists
 if (!empty($flickr_set['id'])) {
+	
 	// Require phpFlickr
 	require_once(dirname(__FILE__) . '/fields/flickr/phpFlickr/phpFlickr.php');
 	$f = new phpFlickr($flickr_set['api_key']);
@@ -30,13 +31,5 @@ if (!empty($flickr_set['id'])) {
 		break;
 		
 	}
-	
-	foreach ($photos['photoset']['photo'] as $photo) {
-		?>
-		<a class="colorbox" href="<?php echo $f->buildPhotoURL($photo, 'medium_640'); ?>">
-			<img src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>" />
-		</a>
-		<?php 
-	} 
 }
 ?>
