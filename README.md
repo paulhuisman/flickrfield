@@ -28,7 +28,7 @@ register_field($name, $path);
 		register_field('flickr_set', dirname(__File__) . '/fields/flickr_set/flickr_set.php');  
 	}  
 
-Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields/flickr.
+Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields
 
 ## More documentation
 
