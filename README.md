@@ -22,12 +22,14 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dr
 
 2.Register the field 
 
-register_field($name, $path). Where $path is the direct path to your theme (add-on subdirectory optional)
+register_field($name, $path);
 
 	if(function_exists('register_field')) {    
-		register_field('flickr_set', dirname(__File__) . '/your-ACF-addon-subdirectory/flickr_set/flickr_set.php');  
+		register_field('flickr_set', dirname(__File__) . '/fields/flickr_set/flickr_set.php');  
 	}  
 
-## More documentatieon
+Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields/flickr.
 
-* Check out ([my personal website](http://www.paulhuisman-online.nl/fresh-look/flickr-field)) for more documentation on how to use this custom field for ACF.
+## More documentation
+
+* Check out [my personal website](http://www.paulhuisman-online.nl/fresh-look/flickr-field) for more documentation on how to use this custom field for ACF.
