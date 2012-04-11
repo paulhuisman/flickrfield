@@ -18,14 +18,14 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dr
 
 1.Download or clone the ACF Flickr set repo to your plugin or theme:  
 * https://github.com/phuisman88/ACF/zipball/master or  
-* git clone git://github.com/phuisman88/ACF.git acf-flickr-set-field  
+* git clone git://github.com/phuisman88/ACF.git acf-flickr-field  
 
 2.Register the field 
 
 register_field($name, $path);
 
 	if(function_exists('register_field')) {    
-		register_field('flickr_set', dirname(__File__) . '/fields/flickr_set/flickr_set.php');  
+		register_field('flickr_set', dirname(__File__) . '/fields/flickr/flickr.php');  
 	}  
 
 Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields
