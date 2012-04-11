@@ -3,7 +3,7 @@ Flickr set field
 
 ## Description
 
-This is an add-on for the Advanced Custom Fields WordPress plugin that adds a dropdown / multiple select field to select a Flickr set from a specific Flickr user.
+This is an add-on for the Advanced Custom Fields WordPress plugin that creates a list of all Flickr sets/galleries from a specific Flickr user.
 
 **Contributors**:
 
