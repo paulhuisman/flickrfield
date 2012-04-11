@@ -1,4 +1,4 @@
-Flickr set field
+Flickr field
 =============
 
 ## Description
