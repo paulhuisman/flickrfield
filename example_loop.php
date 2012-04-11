@@ -6,11 +6,11 @@ $flickr_set = get_field('flickr_set');
 if (!empty($flickr_set['id'])) {
 	
 	// Require phpFlickr
-	require_once(dirname(__FILE__) . '/fields/flickr/phpFlickr/phpFlickr.php');
+	require_once(dirname(__FILE__) . '/fields/flickr/phpFlickr.php');
 	$f = new phpFlickr($flickr_set['api_key']);
 	
 	// Enable phpFlickr caching
-	$f->enableCache("f", dirname(__FILE__) . '/fields/flickr/phpFlickr/cache');
+	$f->enableCache("f", dirname(__FILE__) . '/fields/flickr/cache');
 
 	// Get all data based on Flickr ID (set or gallery)
 	switch ($flickr_set['flickr_content']) {
