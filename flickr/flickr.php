@@ -258,9 +258,11 @@ class Flickr_field extends acf_Field
 		</div>
 		
 		<?php 
-		foreach($sets['photoset'] as $set_key => $set) {
-			// Add to the choices array for the selectbox
-			$field['choices'][$set['id']] = $set['title'] .' (' .$set['photos']. ' photos)';
+		if (!empty($sets['photoset'])) {
+			foreach($sets['photoset'] as $set_key => $set) {
+				// Add to the choices array for the selectbox
+				$field['choices'][$set['id']] = $set['title'] .' (' .$set['photos']. ' photos)';
+			}
 		}
 			
 		// no choices
@@ -356,9 +358,8 @@ class Flickr_field extends acf_Field
 			.field_form.flickr_field table.acf_input 	  
 											  { border:1px solid #aaa; }
 			.flickr_row  			     	  { cursor:pointer; }
-			.flickr_row:hover,
-			.flickr_row.active-row 		  	  { background-color:#f0f0f0;}
-			.field_label .label.set_image	  { width:75px; position:relative; }
+			.flickr_row:hover				  { background-color:#f0f0f0;}
+			.field_label .label.set_image	  { width:75px; position:relative; background:#fff; }
 			.flickr_row:hover .set_image,
 			.active-row .label.set_image  	  { width:79px; padding:8px; }
 			.flickr_row:hover .set_image img  { padding:1px; border:1px solid #aaa; }
@@ -368,16 +369,17 @@ class Flickr_field extends acf_Field
 			.flickr_row .set_title		  	  { margin:0 0 8px 0; font-weight:bold; padding:0; font-size:13px; color:#333; }
 			.flickr_row .meta_data,
 			.flickr_row .meta_data a		  { color:#777; font-size:11px;}
-			.field_form.flickr_field { 
+			.field_form.flickr_field {
 				border:1px solid #d8d8d8; 
 				background:#e8e8e8; 
-			    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8), to(#e3e3e3));
-			    background-image: -webkit-linear-gradient(top, #e8e8e8, #e3e3e3); 
-			    background-image: -moz-linear-gradient(top, #e8e8e8, #e3e3e3);
-			    background-image: -ms-linear-gradient(top, #e8e8e8, #e3e3e3);
-			    background-image: -o-linear-gradient(top, #e8e8e8, #e3e3e3);
+			    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8), to(#e1e1e1));
+			    background-image: -webkit-linear-gradient(top, #e8e8e8, #e1e1e1); 
+			    background-image: -moz-linear-gradient(top, #e8e8e8, #e1e1e1);
+			    background-image: -ms-linear-gradient(top, #e8e8e8, #e1e1e1);
+			    background-image: -o-linear-gradient(top, #e8e8e8, #e1e1e1);
 			}
-			.flickr_row.active-row { 
+			.flickr_row.active-row,
+			.flickr_row.active-row .label.set_image {
 				background-color: #2483b9; 
 				background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#119bc9), to(#2483b9));
 				background-image: -webkit-linear-gradient(top, #119bc9, #2483b9); 
@@ -391,7 +393,7 @@ class Flickr_field extends acf_Field
 			.active-row:hover .set_image img,
 			.active-row .set_image img    	          { padding:1px; border:1px solid #fff; }
 			.flickr_row.active-row .meta_data   	  { color: #a8d9f0; }
-			.flickr_row:hover td.label.set_image 	  { border-right:1px solid #d8d8d8; }
+			.flickr_row:hover td.label.set_image 	  { border-right:1px solid #d8d8d8; background-color:#f0f0f0;  }
 			.flickr_row.active-row td.label.set_image { border-right:1px solid #3d9ed1; }
 			.flickr_row p.description 				  { color:#444; font-style:normal; }
 		</style>
@@ -425,7 +427,7 @@ class Flickr_field extends acf_Field
 					});
 					
 					if ($('.flickr_row',self).hasClass('active-row')) {
-						value = $('.active-row').attr('data-flickr-id');
+						value = $('.active-row', self).attr('data-flickr-id');
 					}
 					
 					input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name'));
