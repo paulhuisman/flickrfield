@@ -25,7 +25,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 register_field($name, $path);
 
 	if(function_exists('register_field')) {    
-		register_field('flickr_set', dirname(__File__) . '/fields/flickr/flickr.php');  
+		register_field('flickr_field', dirname(__File__) . '/fields/flickr/flickr.php');  
 	}  
 
 Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields
