@@ -28,7 +28,8 @@ register_field($name, $path);
 		register_field('flickr_field', dirname(__File__) . '/fields/flickr/flickr.php');  
 	}  
 
-3.Usage Example (PHP)
+
+## Usage Example (PHP)
 
 	// Get the Flickr set data by using get_field
 	$flickr_set = get_field('flickr_set');
