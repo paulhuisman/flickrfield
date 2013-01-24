@@ -34,8 +34,8 @@ register_field($name, $path);
 	// Get the Flickr set data by using get_field
 	$flickr_set = get_field('flickr_set');
 	
-	// Check if an set or gallery ID exists
-	if (!empty($flickr_set['id'])) {
+	// Check if an set or gallery ID exists and if its not null
+	if (!empty($flickr_set['id']) && $flickr_set['id'] != 0) {
 		
 		// Require phpFlickr
 		require_once(dirname(__FILE__) . '/fields/flickr/phpFlickr.php');

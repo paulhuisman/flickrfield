@@ -28,7 +28,7 @@ class Flickr_field extends acf_Field
     	parent::__construct($parent);
     	
     	$this->name = 'Flickr_field';
-		$this->title = __("Flickr Field",'acf'); 
+			$this->title = __("Flickr Field",'acf'); 
 		
    	}
 
@@ -58,8 +58,9 @@ class Flickr_field extends acf_Field
 		
 		// Check if there's an flickr_api_key set in options
 		$flick_api_key = get_option('flickr_api_key');
-		if (!empty($flick_api_key) && empty($field['api_key'])) 
+		if (!empty($flick_api_key) && empty($field['api_key'])) {
 			$field['api_key'] = $flick_api_key;
+		}
 		?>
 		
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
@@ -70,16 +71,17 @@ class Flickr_field extends acf_Field
 			<td>
 				<?php 
 				$this->parent->create_field(array(
-					'type'	=>	'radio',
-					'default' => 'sets',
-					'name'	=>	'fields['.$key.'][flickr_content]',
-					'value'	=>	$field['flickr_content'],
-					'choices' => array(
-						'sets'		=>	'Sets',
-						'galleries'	=>	'Galleries',
-					),
-					'layout'	=>	'horizontal',
-				));
+						'type'	=>	'radio',
+						'default' => 'sets',
+						'name'	=>	'fields['.$key.'][flickr_content]',
+						'value'	=>	$field['flickr_content'],
+						'choices' => array(
+							'sets'		=>	'Sets',
+							'galleries'	=>	'Galleries',
+						),
+						'layout'	=>	'horizontal',
+					)
+				);
 				?>
 			</td>
 		</tr>
@@ -163,7 +165,7 @@ class Flickr_field extends acf_Field
 		$f = new phpFlickr($field['api_key']);
 		
 		// Optionally enable the phpFlickr cache - make sure the folder cache is properly placed
-		//$f->enableCache("fs", dirname(__FILE__) . '/cache');		
+		// $f->enableCache("fs", dirname(__FILE__) . '/cache');		
 		
 		// Get all sets by user ID ordered by post_date desc and limit to max 50 sets
 		$user_id = $field['user_id'];
@@ -355,11 +357,12 @@ class Flickr_field extends acf_Field
 	{
 		?>
 		<style type="text/css">
-			.field_form.flickr_field table.acf_input 	  
-											  { border:1px solid #aaa; }
+			.field_form.flickr_field table.acf_input tbody
+											  { -webkit-border-radius: 5px; border-radius: 5px; }
 			.flickr_row  			     	  { cursor:pointer; }
+			.flickr_row .set_info  	  { border-top:1px solid #dfdfdf; }
 			.flickr_row:hover				  { background-color:#f0f0f0;}
-			.field_label .label.set_image	  { width:75px; position:relative; background:#fff; }
+			.field_label .label.set_image	  { width:75px; position:relative; background:#fff; border-top:1px solid #dfdfdf; }
 			.flickr_row:hover .set_image,
 			.active-row .label.set_image  	  { width:79px; padding:8px; }
 			.flickr_row:hover .set_image img  { padding:1px; border:1px solid #aaa; }
@@ -370,7 +373,7 @@ class Flickr_field extends acf_Field
 			.flickr_row .meta_data,
 			.flickr_row .meta_data a		  { color:#777; font-size:11px;}
 			.field_form.flickr_field {
-				border:1px solid #d8d8d8; 
+				border:1px solid #c8c8c8; 
 				background:#e8e8e8; 
 			    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#e8e8e8), to(#e1e1e1));
 			    background-image: -webkit-linear-gradient(top, #e8e8e8, #e1e1e1); 
@@ -393,7 +396,7 @@ class Flickr_field extends acf_Field
 			.active-row:hover .set_image img,
 			.active-row .set_image img    	          { padding:1px; border:1px solid #fff; }
 			.flickr_row.active-row .meta_data   	  { color: #a8d9f0; }
-			.flickr_row:hover td.label.set_image 	  { border-right:1px solid #d8d8d8; background-color:#f0f0f0;  }
+			.flickr_row:hover td.label.set_image 	  { border-right:1px solid #c8c8c8; background-color:#f0f0f0;  }
 			.flickr_row.active-row td.label.set_image { border-right:1px solid #3d9ed1; }
 			.flickr_row p.description 				  { color:#444; font-style:normal; }
 		</style>
@@ -405,11 +408,15 @@ class Flickr_field extends acf_Field
 						input;
 
 					
-					$('.flickr_row',self).click(function() {
+					$('select option:selected', self).each(function() {
+						value = $(this).val();
+					});
+
+					$('.flickr_row', self).click(function() {
 						// Deselect if active
 						if ($(this).hasClass('active-row')) {
 							$(this).removeClass('active-row');
-							value = '';
+							input.val(0);
 						}
 						else {
 							$('.flickr_row', self).removeClass('active-row');
@@ -422,16 +429,14 @@ class Flickr_field extends acf_Field
 					
 					var value = '';
 					
-					$('select option:selected', self).each(function() {
-						value = $(this).val();
-					});
-					
 					if ($('.flickr_row',self).hasClass('active-row')) {
 						value = $('.active-row', self).attr('data-flickr-id');
 					}
 					
-					input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name'));
-			
+					// Make hidden input with set/gallery id
+					input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name')).addClass('flickr-id');
+					
+					// Remove default select
 					$('select', self).after(input).remove();	
 					
 				});
