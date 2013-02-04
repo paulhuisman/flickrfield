@@ -18,7 +18,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 1.Download or clone the ACF Flickr set repo to your plugin or theme:  
 * https://github.com/phuisman88/flickrfield/zipball/master or  
-* git clone git://github.com/phuisman88/flickrfield.git acf-flickr-field  
+* git clone git://github.com/phuisman88/flickrfield.git . in the <your_theme>/fields directory
 
 2.Register the field 
 
