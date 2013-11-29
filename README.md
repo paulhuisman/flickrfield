@@ -68,7 +68,3 @@ register_field($name, $path);
 	
 
 Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields
-
-## More documentation
-
-* Check out [my personal website](http://www.paulhuisman-online.nl/fresh-look/flickr-field) for more documentation on how to use this custom field for ACF.
