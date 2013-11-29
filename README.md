@@ -7,7 +7,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 **Contributors**:
 
-* Paul Huisman	([paulhuisman-online.nl](http://www.paulhuisman-online.nl))
+* Paul Huisman	([paulhuisman.com](http://www.paulhuisman.com))
 
 ## Notice
 
