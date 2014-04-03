@@ -16,7 +16,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 ## Installation
 
-1.Download or clone the ACF Flickr set repo to your plugin or theme:  
+1. Download or clone the ACF Flickr set repo to your plugin or theme:  
 * https://github.com/phuisman88/flickrfield/zipball/master or  
 * git clone git://github.com/phuisman88/flickrfield.git  in the wp-content/plugins directory
 
@@ -37,23 +37,11 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 		// Enable phpFlickr caching
 		$f->enableCache("f", dirname(__FILE__) . '/fields/flickr/cache');
 	
-		// Get all data based on Flickr ID (set or gallery)
-		switch ($flickr_set['flickr_content']) {
-			
-			case 'sets':
-				$photos = $f->photosets_getPhotos($flickr_set['id']);
-				foreach ($photos['photoset']['photo'] as $photo) {	
-					echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';
-				}
-			break;
-			
-			case 'galleries':
-				$photos = $f->galleries_getPhotos($flickr_set['id']);
-				
-				foreach ($photos['photos']['photo'] as $photo) {
-					echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';
-				}
-			break;
+	
+		$photos = $f->photosets_getPhotos($flickr_set['id']);
+		foreach ($photos['photoset']['photo'] as $photo) {	
+			echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';
+		}
 			
 		}
 		
