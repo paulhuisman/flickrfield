@@ -24,7 +24,7 @@
 			
 		});
 
-		$('#acf-flickr .flickr_field').each(function() {
+		$('.field_form.flickr_field').each(function() {
 			var self = $(this).parent(),
 				input;
 			
