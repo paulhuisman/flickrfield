@@ -3,7 +3,7 @@
 Plugin Name: Advanced Custom Fields: Flickr
 Plugin URI: https://github.com/phuisman88
 Description: Flickr field for Advanced Custom Fields
-Version: 0.1
+Version: 1.0
 Author: Paul Huisman
 Author URI: www.paulhuisman.com
 License: GPLv2 or later
