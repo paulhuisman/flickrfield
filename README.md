@@ -37,10 +37,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 	
 		$photos = $f->photosets_getPhotos($flickr_set['id']);
 		foreach ($photos['photoset']['photo'] as $photo) {	
-			echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';
-		}
-			
+			echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';	
 		}
 		
 	}
-	
