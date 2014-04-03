@@ -16,11 +16,9 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 ## Installation
 
-1. Download or clone the ACF Flickr set repo to your plugin or theme:  
-2. https://github.com/phuisman88/flickrfield/zipball/master or  
-3. git clone git://github.com/phuisman88/flickrfield.git  in the wp-content/plugins directory
-4. Enable the plugin in Wordpress.
-5. Succes! You can now select a Flickr field when you create new custom fields.
+1. Download or clone the ACF Flickr Field repo to your plugin directory by downloading https://github.com/phuisman88/flickrfield/zipball/master or cloning: git clone git://github.com/phuisman88/flickrfield.git  
+2. Enable the plugin in Wordpress.
+3. Succes! You can now select a Flickr field when you create new custom fields.
 
 ## Usage Example (PHP)
 
