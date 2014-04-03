@@ -18,16 +18,9 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 1.Download or clone the ACF Flickr set repo to your plugin or theme:  
 * https://github.com/phuisman88/flickrfield/zipball/master or  
-* git clone git://github.com/phuisman88/flickrfield.git . in the <your_theme>/fields directory
+* git clone git://github.com/phuisman88/flickrfield.git  in the wp-content/plugins directory
 
-2.Register the field 
-
-register_field($name, $path);
-
-	if(function_exists('register_field')) {    
-		register_field('flickr_field', dirname(__File__) . '/fields/flickr/flickr.php');  
-	}  
-
+2. Enable the field in Wordpress.
 
 ## Usage Example (PHP)
 
@@ -66,5 +59,3 @@ register_field($name, $path);
 		
 	}
 	
-
-Make sure the folder flickr is located in wp-content/themes/[YOUR THEME]/fields
