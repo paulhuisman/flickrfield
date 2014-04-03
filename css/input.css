@@ -1,9 +1,9 @@
 .field_form.flickr_field {
 	overflow-y:auto; 
-	max-height:500px;
+	max-height:509px;
 }
 .flickr_row  			     	  { cursor:pointer; }
-.flickr_row .set_info  	  { border-top:1px solid #dfdfdf; }
+.flickr_row .set_info  	  { border-top:1px solid #dfdfdf; padding:13px; }
 .flickr_row:hover				  { background-color:#f0f0f0;}
 .field_label .label.set_image	  { width:75px; position:relative; background:#fff; border-top:1px solid #dfdfdf; padding:13px 13px 13px 15px; }
 .flickr_row:hover .set_image,
