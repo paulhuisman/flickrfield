@@ -17,10 +17,10 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 ## Installation
 
 1. Download or clone the ACF Flickr set repo to your plugin or theme:  
-* https://github.com/phuisman88/flickrfield/zipball/master or  
-* git clone git://github.com/phuisman88/flickrfield.git  in the wp-content/plugins directory
-
-2. Enable the field in Wordpress.
+2. https://github.com/phuisman88/flickrfield/zipball/master or  
+3. git clone git://github.com/phuisman88/flickrfield.git  in the wp-content/plugins directory
+4. Enable the plugin in Wordpress.
+5. Succes! You can now select a Flickr field when you create new custom fields.
 
 ## Usage Example (PHP)
 
@@ -36,7 +36,6 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 		
 		// Enable phpFlickr caching
 		$f->enableCache("f", dirname(__FILE__) . '/fields/flickr/cache');
-	
 	
 		$photos = $f->photosets_getPhotos($flickr_set['id']);
 		foreach ($photos['photoset']['photo'] as $photo) {	
