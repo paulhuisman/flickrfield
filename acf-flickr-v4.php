@@ -21,13 +21,15 @@ class acf_field_flickr extends acf_field {
 		// vars
 		$this->name = 'flickr';
 		$this->label = __('Flickr Field');
-		$this->category = __("Flickr",'acf'); // Basic, Content, Choice, etc
+		$this->category = __("Flickr", 'acf'); // Basic, Content, Choice, etc
 		$this->defaults = array(
 			// add default here to merge into your field. 
-			'flickr_api_key'     => '',
-			'flickr_user_id'     => '',
-			'flickr_content'     => 'sets',
-			'flickr_sets_amount' => '30',
+			'flickr_api_key'        => '',
+			'flickr_user_id'        => '',
+			'flickr_content_type'   => 'sets',
+			'flickr_sets_amount'    => '9999',
+			'flickr_cache_enabled'  => '1',
+			'flickr_cache_duration' => '168',
 		);
 		
 		
@@ -68,11 +70,54 @@ class acf_field_flickr extends acf_field {
 		$key = $field['name'];		
 		
 		// Create Fields
-		?>
+		?>		
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
-				<label><?php _e('Flickr User ID','acf'); ?></label>
-				<p class="description"><a href="http://idgettr.com/">http://idgettr.com/</a></p>
+				<label><?php _e( 'Type of content', 'acf-flickr' );?></label>
+				<p class="description"><?php _e('Do you want to be able to select photos from the photostream or use sets that you already created on Flickr.com?', 'acf-flickr');?></p>
+			</td>
+			<td>
+				<?php
+				do_action('acf/create_field', array(
+					'type'	=>	'select',
+					'name'	=>	'fields['.$key.'][flickr_content_type]',
+					'value'	=>	$field['flickr_content_type'],
+					'choices' => array(
+						'sets'        => 'Sets',
+						//'photostream' => 'Photostream',
+					),
+				));
+				?>
+		   </td>
+		</tr>
+		<tr class="field_option field_option_<?php echo $this->name; ?>">
+			<td class="label">
+				<label><?php _e( 'Display amount', 'acf-flickr' );?></label>
+				<p class="description"><?php _e('How many sets/photos do you want to select from? The most recent items will be shown first.', 'acf-flickr');?></p>
+			</td>
+			<td>
+				<?php
+				do_action('acf/create_field', array(
+					'type'	=>	'select',
+					'name'	=>	'fields['.$key.'][flickr_sets_amount]',
+					'value'	=>	$field['flickr_sets_amount'],
+					'choices' => array(
+						'10'   =>'10',
+						'20'   =>'20',
+						'30'   =>'30',
+						'40'   =>'40',
+						'50'   =>'50',
+						'100'  =>'100',
+						'9999' =>'Unlimited',
+					)
+				));
+				?>
+		   </td>
+		</tr>
+		<tr class="field_option field_option_<?php echo $this->name; ?>">
+			<td class="label">
+				<label><?php _e('Flickr User ID','acf-flickr'); ?><span class="required">*</span></label>
+				<p class="description">Find your User ID at <a href="http://idgettr.com/">http://idgettr.com/</a></p>
 			</td>
 			<td>
 				<?php		
@@ -86,8 +131,8 @@ class acf_field_flickr extends acf_field {
 		</tr>
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
-				<label><?php _e('Flickr API Key','acf'); ?></label>
-				<p class="description"><?php _e('Find or register your API key at http://www.flickr.com/services/apps/by/[USERNAME]', 'acf');?></p>
+				<label><?php _e('Flickr API Key','acf-flickr'); ?><span class="required">*</span></label>
+				<p class="description"><?php _e('Find or register your API key at <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>', 'acf-flickr');?></p>
 			</td>
 			<td>
 				<?php		
@@ -98,29 +143,39 @@ class acf_field_flickr extends acf_field {
 				));		
 				?>
 			</td>
-		</tr>
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
+		</tr><tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
-				<label><?php _e( 'Flickr set display amount', 'acf' );?></label>
-				<p class="description"><?php _e('Number of sets to display. The most recent made sets will be shown first.', 'acf');?></p>
+				<label><?php _e( 'Enable cache', 'acf-flickr' );?></label>
+				<p class="description"><?php _e('Once enabled, make sure the cache folder inside the flickr field plugin is writable.', 'acf-flickr');?></p>
 			</td>
 			<td>
 				<?php
 				do_action('acf/create_field', array(
 					'type'	=>	'select',
-					'name'	=>	'fields['.$key.'][flickr_sets_amount]',
-					'value'	=>	$field['flickr_sets_amount'],
+					'name'	=>	'fields['.$key.'][flickr_cache_enabled]',
+					'value'	=>	$field['flickr_cache_enabled'],
 					'choices' => array(
-						'10' =>'10',
-						'20' =>'20',
-						'30' =>'30',
-						'40' =>'40',
-						'50' =>'50',
-						'100' =>'100',
-					)
+						'1' => 'Yes',
+						'0' => 'No',
+					),
 				));
 				?>
 		   </td>
+		</tr>
+		<tr class="field_option field_option_<?php echo $this->name; ?>">
+			<td class="label">
+				<label><?php _e('Cache duration','acf-flickr'); ?></label>
+				<p class="description">The time your cache may last in hours (this setting will be ignored when your cache is disabled).</p>
+			</td>
+			<td>
+				<?php		
+				do_action('acf/create_field', array(
+					'type'		=>	'text',
+					'name'		=>	'fields['.$key.'][flickr_cache_duration]',
+					'value'		=>	$field['flickr_cache_duration'],
+				));		
+				?>
+			</td>
 		</tr>
 		<?php
 		
@@ -148,9 +203,17 @@ class acf_field_flickr extends acf_field {
 		require_once(dirname(__FILE__) . '/phpFlickr.php');
 		$f = new phpFlickr($field['flickr_api_key']);
 		
-		// Optionally enable the phpFlickr cache - make sure the folder cache is properly placed
-		$f->enableCache("fs", dirname(__FILE__) . '/cache');		
-				
+		// Caching
+		$cache_dir = dirname(__FILE__) . '/cache';		
+		$cache_ready = true;
+		if (!is_writeable($cache_dir) || $field['flickr_cache_enabled'] == 0) {
+			$cache_ready = false;
+		}			
+		if ($cache_ready) {
+			$duration = $field['flickr_cache_duration'] * 60 * 60;
+			$f->enableCache('fs', $cache_dir, $duration);		
+		}		
+
 		// Include fields.css from the ACF plugin for some more styling
 		wp_register_style('fields-css',get_bloginfo('wpurl'). '/wp-content/plugins/advanced-custom-fields/css/fields.css');
 		wp_enqueue_style('fields-css');
@@ -159,45 +222,67 @@ class acf_field_flickr extends acf_field {
 		$field['choices'][''] = '';
 		?>
 		
-		<div class="field_form flickr_field">
-			<table class="acf_input widefat acf_field_form_table">
-				<tbody>
-					<?php		
-					$flickr_data = $f->photosets_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
+		<div class="field_form flickr_field type_<?php echo $field['flickr_content_type']; ?>">
+			<?php
+			if ($field['flickr_content_type'] == 'sets') {
+				$flickr_data = $f->photosets_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
+				?>
 
-					if (is_array($flickr_data) && !empty($flickr_data)) {
-						foreach($flickr_data['photoset'] as $key => $flickr) {
-							?>
-							<tr class="field_label flickr_row <?php if ($field['value'] == $flickr['id']) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
-								<td class="label set_image">
-									<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['farm'];?>.static.flickr.com/<?php echo $flickr['server'];?>/<?php echo $flickr['primary'];?>_<?php echo $flickr['secret'];?>_s.jpg">
-								</td>
-								<td class="set_info">
-									<p class="set_title"><?php echo $flickr['title'];?></p>
-									<p class="description"><?php echo $flickr['description'];?></p>
-									<p class="meta_data">
-										<?php _e('Added on');?> <?php echo date_i18n(get_option('date_format') ,$flickr['date_create']); echo ' &nbsp;|&nbsp; ';
-										echo $flickr['count_views'];?> <?php _e('views on Flickr'); 
-										echo ' &nbsp;|&nbsp; ';
-										echo $flickr['photos'];?> <?php _e('Photos');
-										if ($flickr['videos'] != 0) {
-											echo ' &nbsp;|&nbsp; '. $flickr['videos'] .' ';
-											_e('Videos');
-										} ?>
-									</p>
-								</td>
-							 </tr>
-							<?php
-						}
-					}	
-					else {
-						?><tr class="field_label">
-							<td colspan="2"><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></td>
-						</tr><?php
-					}				
+				<table class="acf_input widefat acf_field_form_table">
+					<tbody>
+						<?php
+						if (is_array($flickr_data) && !empty($flickr_data)) {
+							foreach($flickr_data['photoset'] as $key => $flickr) {
+								?>
+								<tr class="field_label flickr_row <?php if ($field['value']['set_id'] == $flickr['id']) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
+									<td class="label set_image">
+										<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['farm'];?>.static.flickr.com/<?php echo $flickr['server'];?>/<?php echo $flickr['primary'];?>_<?php echo $flickr['secret'];?>_s.jpg">
+									</td>
+									<td class="set_info">
+										<p class="set_title"><?php echo $flickr['title'];?></p>
+										<p class="description"><?php echo $flickr['description'];?></p>
+										<p class="meta_data">
+											<?php _e('Added on');?> <?php echo date_i18n(get_option('date_format') ,$flickr['date_create']); echo ' &nbsp;|&nbsp; ';
+											echo $flickr['count_views'];?> <?php _e('views on Flickr'); 
+											echo ' &nbsp;|&nbsp; ';
+											echo $flickr['photos'];?> <?php _e('Photos');
+											if ($flickr['videos'] != 0) {
+												echo ' &nbsp;|&nbsp; '. $flickr['videos'] .' ';
+												_e('Videos');
+											} ?>
+										</p>
+									</td>
+								 </tr>
+								<?php
+							}
+						}	
+						else {
+							?><tr class="field_label">
+								<td colspan="2"><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></td>
+							</tr><?php
+						}		
 					?>
 				</tbody>
 			</table>
+			<?php
+			}
+			elseif($field['flickr_content_type'] == 'photostream') {
+				$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, NULL, $field['flickr_sets_amount'], '');
+
+				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
+					<ul class="field_label photostream">
+						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
+							<li class="label flickr_row photo_image <?php if ($field['value'] == $photo['id']) echo 'active-row'; ?>" data-flickr-id="<?php echo $photo['id']; ?>">
+								<img title="<?php echo $photo['title'];?>" src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php else: ?>
+					<p><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></p>
+				<?php 
+				endif;
+			}	
+			?>
 		</div>
 		
 		<?php 
@@ -211,7 +296,7 @@ class acf_field_flickr extends acf_field {
 		// no choices
 		if(empty($field['choices']))
 		{
-			echo '<p>' . __("No choices to choose from",'acf') . '</p>';
+			echo '<p>' . __("No choices to choose from",'acf-flickr') . '</p>';
 			return false;
 		}
 		
@@ -388,8 +473,13 @@ class acf_field_flickr extends acf_field {
 	
 	function load_value( $value, $post_id, $field )
 	{
-		// Note: This function can be removed if not used
-		return $value;
+		$data = array();
+
+		$data['set_id']  = $value;
+		$data['user_id'] = $field['flickr_user_id'];
+		$data['api_key'] = $field['flickr_api_key'];
+
+		return $data;
 	}
 	
 	
