@@ -22,22 +22,24 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 ## Usage Example (PHP)
 
-	// Get the Flickr set data by using get_field
-	$flickr_set = get_field('flickr_set');
+// Get Flickr Field data
+	$flickr = get_field(FIELD_NAME);
 	
-	// Check if an set or gallery ID exists and if its not null
-	if (!empty($flickr_set['id']) && $flickr_set['id'] != 0) {
-		
+	if (!empty($flickr['set_id']) && $flickr['set_id'] != 0) {
 		// Require phpFlickr
-		require_once(dirname(__FILE__) . '/fields/flickr/phpFlickr.php');
-		$f = new phpFlickr($flickr_set['api_key']);
+		require_once(getCwd()  . '/wp-content/plugins/flickrfield/phpFlickr.php');
+
+		// Initialize a new phpFlickr object based on your api key
+		$f = new phpFlickr($flickr['api_key']);
 		
-		// Enable phpFlickr caching
-		$f->enableCache("f", dirname(__FILE__) . '/fields/flickr/cache');
-	
-		$photos = $f->photosets_getPhotos($flickr_set['id']);
+		// Optionally: enable phpFlickr caching
+		$f->enableCache('f', getCwd()  . '/wp-content/plugins/flickrfield/cache');
+		
+		// Get photos from Flickr based on set id
+		$photos = $f->photosets_getPhotos($flickr['set_id']);
+
+		// Loop through photos and print them
 		foreach ($photos['photoset']['photo'] as $photo) {	
 			echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';	
-		}
-		
+		}		
 	}
