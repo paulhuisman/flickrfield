@@ -22,7 +22,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 ## Usage Example (PHP)
 
-// Get Flickr Field data
+	// Get Flickr Field data
 	$flickr = get_field(FIELD_NAME);
 	
 	if (!empty($flickr['set_id']) && $flickr['set_id'] != 0) {
