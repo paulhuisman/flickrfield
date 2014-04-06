@@ -17,12 +17,6 @@
 	*/
 	
 	$(document).live('acf/setup_fields', function(e, postbox){
-		
-		$(postbox).find('.field[data-field_type="FIELD_NAME"]').each(function(){
-			
-			initialize_field( $(this) );
-			
-		});
 
 		$('.field_form.flickr_field').each(function() {
 			var self = $(this).parent(),
@@ -36,26 +30,25 @@
 				// Deselect if active
 				if ($(this).hasClass('active-row')) {
 					$(this).removeClass('active-row');
-					input.val(0);
 				}
 				else {
-					$('.flickr_row', self).removeClass('active-row');
 					$(this).addClass('active-row');
-					
-					// Adjust value of the input hidden field
-					input.val($(this).attr('data-flickr-id'));
+				}
+
+				var active_items = new Array();
+				$('.flickr_row.active-row').each(function() {
+					active_items.push($(this).attr('data-flickr-id'));	
+				});
+
+				if (active_items.length > 0) {
+					input.val(JSON.stringify(active_items));
 				}
 			});
 			
-			var value = '';
-			
-			if ($('.flickr_row', self).hasClass('active-row')) {
-				value = $('.active-row', self).attr('data-flickr-id');
-			}
-			
 			// Make hidden input with set/gallery id
-			input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name')).addClass('flickr-id');
+			input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name')).addClass('flickr-id');	
 			
+
 			// Remove default select
 			$('select', self).after(input).remove();	
 		});

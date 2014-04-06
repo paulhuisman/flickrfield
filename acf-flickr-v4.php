@@ -84,7 +84,7 @@ class acf_field_flickr extends acf_field {
 					'value'	=>	$field['flickr_content_type'],
 					'choices' => array(
 						'sets'        => 'Sets',
-						//'photostream' => 'Photostream',
+						'photostream' => 'Photostream',
 					),
 				));
 				?>
@@ -224,17 +224,20 @@ class acf_field_flickr extends acf_field {
 		
 		<div class="field_form flickr_field type_<?php echo $field['flickr_content_type']; ?>">
 			<?php
+			$items = array();
+			$items = json_decode($field['value']['items']);
+
 			if ($field['flickr_content_type'] == 'sets') {
 				$flickr_data = $f->photosets_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
 				?>
 
 				<table class="acf_input widefat acf_field_form_table">
 					<tbody>
-						<?php
+						<?php					
 						if (is_array($flickr_data) && !empty($flickr_data)) {
 							foreach($flickr_data['photoset'] as $key => $flickr) {
 								?>
-								<tr class="field_label flickr_row <?php if ($field['value']['set_id'] == $flickr['id']) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
+								<tr class="field_label flickr_row <?php if (in_array($flickr['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
 									<td class="label set_image">
 										<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['farm'];?>.static.flickr.com/<?php echo $flickr['server'];?>/<?php echo $flickr['primary'];?>_<?php echo $flickr['secret'];?>_s.jpg">
 									</td>
@@ -268,11 +271,11 @@ class acf_field_flickr extends acf_field {
 			}
 			elseif($field['flickr_content_type'] == 'photostream') {
 				$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, NULL, $field['flickr_sets_amount'], '');
-
+			
 				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
 					<ul class="field_label photostream">
 						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
-							<li class="label flickr_row photo_image <?php if ($field['value'] == $photo['id']) echo 'active-row'; ?>" data-flickr-id="<?php echo $photo['id']; ?>">
+							<li class="label flickr_row photo_image <?php if (in_array($photo['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $photo['id']; ?>">
 								<img title="<?php echo $photo['title'];?>" src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
 							</li>
 						<?php endforeach; ?>
@@ -402,24 +405,6 @@ class acf_field_flickr extends acf_field {
 	
 	
 	/*
-	*  input_admin_head()
-	*
-	*  This action is called in the admin_head action on the edit screen where your field is created.
-	*  Use this action to add CSS and JavaScript to assist your create_field() action.
-	*
-	*  @info	http://codex.wordpress.org/Plugin_API/Action_Reference/admin_head
-	*  @type	action
-	*  @since	3.6
-	*  @date	23/01/13
-	*/
-
-	function input_admin_head()
-	{
-		// Note: This function can be removed if not used
-	}
-	
-	
-	/*
 	*  field_group_admin_enqueue_scripts()
 	*
 	*  This action is called in the admin_enqueue_scripts action on the edit screen where your field is edited.
@@ -430,30 +415,6 @@ class acf_field_flickr extends acf_field {
 	*  @since	3.6
 	*  @date	23/01/13
 	*/
-
-	function field_group_admin_enqueue_scripts()
-	{
-		// Note: This function can be removed if not used
-	}
-
-	
-	/*
-	*  field_group_admin_head()
-	*
-	*  This action is called in the admin_head action on the edit screen where your field is edited.
-	*  Use this action to add CSS and JavaScript to assist your create_field_options() action.
-	*
-	*  @info	http://codex.wordpress.org/Plugin_API/Action_Reference/admin_head
-	*  @type	action
-	*  @since	3.6
-	*  @date	23/01/13
-	*/
-
-	function field_group_admin_head()
-	{
-		// Note: This function can be removed if not used
-	}
-
 
 	/*
 	*  load_value()
@@ -475,7 +436,7 @@ class acf_field_flickr extends acf_field {
 	{
 		$data = array();
 
-		$data['set_id']  = $value;
+		$data['items']   = $value;
 		$data['user_id'] = $field['flickr_user_id'];
 		$data['api_key'] = $field['flickr_api_key'];
 
@@ -531,7 +492,6 @@ class acf_field_flickr extends acf_field {
 		
 		// perhaps use $field['preview_size'] to alter the $value?
 		
-		
 		// Note: This function can be removed if not used
 		return $value;
 	}
@@ -555,15 +515,11 @@ class acf_field_flickr extends acf_field {
 	
 	function format_value_for_api( $value, $post_id, $field )
 	{
-		// defaults?
-		/*
-		$field = array_merge($this->defaults, $field);
-		*/
+		if (!empty($value['items'])) {
+			// Decode JSON format that is used in the database 
+			$value['items'] = json_decode($value['items']);
+		}
 		
-		// perhaps use $field['preview_size'] to alter the $value?
-		
-		
-		// Note: This function can be removed if not used
 		return $value;
 	}
 	
