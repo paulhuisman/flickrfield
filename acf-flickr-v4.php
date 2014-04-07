@@ -117,7 +117,7 @@ class acf_field_flickr extends acf_field {
 					'choices' => array(
 						'sets'        => 'Sets',
 						'galleries'   => 'Galleries',
-						'photostream' => 'Photostream (Beta)',
+						'photostream' => 'Photostream',
 					),
 				));
 				?>
@@ -334,7 +334,7 @@ class acf_field_flickr extends acf_field {
 				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
 					<ul class="field_label photostream">
 						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
-							<li class="label flickr_row photo_image <?php if (in_array($photo['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
+							<li class="label flickr_row photo_image <?php if (in_array($f->buildPhotoURL($photo, 'square'), $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
 								<img title="<?php echo $photo['title'];?>" src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
 							</li>
 						<?php endforeach; ?>

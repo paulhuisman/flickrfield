@@ -1,13 +1,13 @@
-Flickr field
+Flickr field for Advanced Custom Fields
 =============
 
 ## Description
 
-This is an add-on for the Advanced Custom Fields WordPress plugin that creates a list of all Flickr sets/galleries from a specific Flickr user.
+This is an add-on for the Advanced Custom Fields WordPress plugin that creates a list of all photos/sets/galleries from a specific Flickr user.
 
 ## Notice
 
-- This add-on needs [ACF](http://www.advancedcustomfields.com/) 
+- This add-on needs [Advanced Custom Fields](http://www.advancedcustomfields.com/).
 - I recommend using [Easy Fancybox](https://wordpress.org/plugins/easy-fancybox/) if you want to use a lightbox that's very easy to setup.
 
 ## Installation
@@ -19,7 +19,7 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 ## Usage Example (PHP)
 
 	$flickr = get_field(FIELD_NAME);
-	
+
 	if (isset($flickr['items'])) {
 		foreach ($flickr['items'] as $id => $photo) {
 			echo '<a href="' . $photo['large'] . '"><img src="' . $photo['thumb'] . '" /></a>';
