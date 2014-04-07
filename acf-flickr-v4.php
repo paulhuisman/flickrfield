@@ -169,7 +169,7 @@ class acf_field_flickr extends acf_field {
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
 				<label><?php _e('Cache duration','acf-flickr'); ?></label>
-				<p class="description">The time your cache may last in hours (this setting will be ignored when your cache is disabled).</p>
+				<p class="description">The time your cache may last in minutes (this setting will be ignored when your cache is disabled).</p>
 			</td>
 			<td>
 				<?php		
@@ -334,7 +334,24 @@ class acf_field_flickr extends acf_field {
 				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
 					<ul class="field_label photostream">
 						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
-							<li class="label flickr_row photo_image <?php if (in_array($f->buildPhotoURL($photo, 'square'), $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
+							<?php 
+							$active = '';
+							if (is_array($items)) {
+								foreach ($items as $k => $item) {
+									$item = get_object_vars($item);
+									if(is_array($item) && in_array($photo['id'], $item)) {
+										$active = ' active-row';
+									}
+								}
+							}
+							?>
+							<li class="label flickr_row photo_image<?php echo $active; ?>" 
+								data-flickr-id="<?php echo $photo['id']; ?>" 
+								data-flickr-server="<?php echo $photo['server']; ?>"
+								data-flickr-secret="<?php echo $photo['secret']; ?>"
+								data-flickr-farm="<?php echo $photo['farm']; ?>"
+								data-flickr-title="<?php echo $photo['title']; ?>"
+								>
 								<img title="<?php echo $photo['title'];?>" src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
 							</li>
 						<?php endforeach; ?>
@@ -588,7 +605,7 @@ class acf_field_flickr extends acf_field {
 			// enable phpFlickr caching if possible
 			$cache_dir = dirname(__FILE__) . '/cache';
 			if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
-				$duration = $field['flickr_cache_duration'] * 60 * 60;
+				$duration = $field['flickr_cache_duration'] * 60;
 				$f->enableCache('fs', $cache_dir, $duration);		
 			}	
 
@@ -606,17 +623,22 @@ class acf_field_flickr extends acf_field {
 					}
 					// Loop through all photos and create a thumb and large url
 					foreach ($photos[$name]['photo'] as $photo) {
-						$sets[$id][$photo['id']]['thumb'] = $f->buildPhotoURL($photo, $value['thumb_size']);
-						$sets[$id][$photo['id']]['large'] = $f->buildPhotoURL($photo, $value['large_size']);
+						$sets[$id][$photo['id']]['title']    = $photo['title'];
+						$sets[$id][$photo['id']]['thumb']    = $f->buildPhotoURL($photo, $value['thumb_size']);
+						$sets[$id][$photo['id']]['large']    = $f->buildPhotoURL($photo, $value['large_size']);
+						$sets[$id][$photo['id']]['photo_id'] = $photo['id'];
 					}	
 				}
 				$value['items'] = $sets;
 			}
 			elseif($value['type'] == 'photostream') {
-				foreach($value['items'] as $photo_url) {			
+
+				foreach($value['items'] as $photo) {				
 					$items[] = array(
-						'thumb' => $photo_url,
-						'large' => str_replace('_s.jpg', '_b.jpg', $photo_url),
+						'title'    => $photo->title,
+						'thumb'    => $f->buildPhotoURL($photo, $value['thumb_size']),
+						'large'    => $f->buildPhotoURL($photo, $value['large_size']),
+						'photo_id' => $photo->id,
 					);
 				}
 				$value['items'] = $items;
@@ -671,7 +693,6 @@ class acf_field_flickr extends acf_field {
 
 	
 }
-
 
 // create field
 new acf_field_flickr();

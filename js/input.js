@@ -37,7 +37,19 @@
 
 				var active_items = new Array();
 				$('.flickr_row.active-row').each(function() {
-					active_items.push($(this).attr('data-flickr-id'));	
+					if ($(this).hasClass('photo_image')) {
+						active_items.push({
+							id: $(this).attr('data-flickr-id'), 
+							server: $(this).attr('data-flickr-server'), 
+							secret: $(this).attr('data-flickr-secret'), 
+							farm: $(this).attr('data-flickr-farm'), 
+							title: $(this).attr('data-flickr-title')
+						});	
+					} 
+					else {
+						active_items.push($(this).attr('data-flickr-id'));	
+					}
+					
 				});
 
 				if (active_items.length > 0) {
@@ -45,7 +57,7 @@
 				}
 			});
 			
-			// Make hidden input with set/gallery id
+			// Make hidden input with flickr data
 			input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name')).addClass('flickr-id');	
 
 			// Remove default select

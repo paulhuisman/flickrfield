@@ -353,6 +353,10 @@ if ( !class_exists('phpFlickr') ) {
 		/* These functions are front ends for the flickr calls */
 
 		function buildPhotoURL ($photo, $size = "Medium") {
+			// check if object 
+			if (is_object($photo)) {
+				$photo = get_object_vars($photo);
+			}
 			//receives an array (can use the individual photo data returned
 			//from an API call) and returns a URL (doesn't mean that the
 			//file size exists)
