@@ -357,25 +357,34 @@ if ( !class_exists('phpFlickr') ) {
 			//from an API call) and returns a URL (doesn't mean that the
 			//file size exists)
 			$sizes = array(
-				"square" => "_s",
-				"thumbnail" => "_t",
-				"small" => "_m",
-				"medium" => "",
-				"medium_640" => "_z",
-				"large" => "_b",
-				"original" => "_o"
+			  "square" => "_s",
+        "square_75" => "_s",
+        "square_150" => "_q",
+        "thumbnail" => "_t",
+        "small" => "_m",
+        "small_240" => "_m",
+        "small_320" => "_n",
+        "medium" => "",
+        "medium_500" => "",
+        "medium_640" => "_z",
+        "medium_800" => "_c",
+        "large" => "_b",
+        "large_1024" => "_b",
+        "large_1600" => "_h",
+        "large_2048" => "_k",
+        "original" => "_o",
 			);
 			
 			$size = strtolower($size);
 			if (!array_key_exists($size, $sizes)) {
 				$size = "medium";
 			}
+			//var_dump($photo);exit;
+			// http://farm8.staticflickr.com/7113/7035203821_75c2b0b94d_o.jpg
+			// http://farm8.staticflickr.com/7113/7035203821_09d4158f08_o.jpg
+			// http://farm8.static.flickr.com/7113/7035203821_09d4158f08_o.jpg
+			$url = "http://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['secret'] . $sizes[$size] . ".jpg";
 			
-			if ($size == "original") {
-				$url = "http://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['originalsecret'] . "_o" . "." . $photo['originalformat'];
-			} else {
-				$url = "http://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['secret'] . $sizes[$size] . ".jpg";
-			}
 			return $url;
 		}
 

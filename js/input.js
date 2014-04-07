@@ -47,7 +47,6 @@
 			
 			// Make hidden input with set/gallery id
 			input = $('<input />').attr('type', 'hidden').val(value).attr('name',$('select', self).attr('name')).addClass('flickr-id');	
-			
 
 			// Remove default select
 			$('select', self).after(input).remove();	

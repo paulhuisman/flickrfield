@@ -5,14 +5,10 @@ Flickr field
 
 This is an add-on for the Advanced Custom Fields WordPress plugin that creates a list of all Flickr sets/galleries from a specific Flickr user.
 
-**Contributors**:
-
-* Paul Huisman	([paulhuisman.com](http://www.paulhuisman.com))
-
 ## Notice
 
 - This add-on needs [ACF](http://www.advancedcustomfields.com/) 
-
+- I recommend using [Easy Fancybox](https://wordpress.org/plugins/easy-fancybox/) if you want to use a lightbox that's very easy to setup.
 
 ## Installation
 
@@ -22,24 +18,10 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 ## Usage Example (PHP)
 
-	// Get Flickr Field data
 	$flickr = get_field(FIELD_NAME);
 	
-	if (!empty($flickr['set_id']) && $flickr['set_id'] != 0) {
-		// Require phpFlickr
-		require_once(getCwd()  . '/wp-content/plugins/flickrfield/phpFlickr.php');
-
-		// Initialize a new phpFlickr object based on your api key
-		$f = new phpFlickr($flickr['api_key']);
-		
-		// Optionally: enable phpFlickr caching
-		$f->enableCache('f', getCwd()  . '/wp-content/plugins/flickrfield/cache');
-		
-		// Get photos from Flickr based on set id
-		$photos = $f->photosets_getPhotos($flickr['set_id']);
-
-		// Loop through photos and print them
-		foreach ($photos['photoset']['photo'] as $photo) {	
-			echo '<a href="'. $f->buildPhotoURL($photo, 'large') .'"><img src="'. $f->buildPhotoURL($photo, 'square') .'"/></a>';	
-		}		
+	if (isset($flickr['items'])) {
+		foreach ($flickr['items'] as $id => $photo) {
+			echo '<a href="' . $photo['large'] . '"><img src="' . $photo['thumb'] . '" /></a>';
+		}
 	}
