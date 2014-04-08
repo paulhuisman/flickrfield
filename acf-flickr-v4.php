@@ -36,10 +36,10 @@ class acf_field_flickr extends acf_field {
 		
 		
 		// do not delete!
-    	parent::__construct();
+    parent::__construct();
     	
     	
-    	// settings
+    // settings
 		$this->settings = array(
 			'path' => apply_filters('acf/helpers/get_path', __FILE__),
 			'dir' => apply_filters('acf/helpers/get_dir', __FILE__),
@@ -197,6 +197,8 @@ class acf_field_flickr extends acf_field {
 						'square'     => '75x75 (square)',
 						'thumbnail'  => '100px (rectangle)',
 						'square_150' => '150x150 (square)',
+						'small_240'  => '240px (rectangle)',
+						'small_320'  => '320px (rectangle)',
 					)
 				));
 				?>
@@ -462,13 +464,12 @@ class acf_field_flickr extends acf_field {
 	function input_admin_enqueue_scripts()
 	{
 		// register ACF scripts
-		wp_register_script( 'acf-input-flickr', $this->settings['dir'] . 'js/input.js', array('acf-input'), $this->settings['version'] );
+		wp_register_script( 'acf-flickr-init', $this->settings['dir'] . 'js/flickr-acf4.js', array('acf-input'), $this->settings['version'] );
 		wp_register_style( 'acf-input-flickr', $this->settings['dir'] . 'css/input.css', array('acf-input'), $this->settings['version'] ); 
-		
 		
 		// scripts
 		wp_enqueue_script(array(
-			'acf-input-flickr',	
+			'acf-flickr-init',	
 		));
 
 		// styles

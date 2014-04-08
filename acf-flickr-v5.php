@@ -53,16 +53,6 @@ class acf_field_flickr extends acf_field {
 			'flickr_cache_duration' => '168',
 		);
 		
-		
-		/*
-		*  l10n (array) Array of strings that are used in JavaScript. This allows JS strings to be translated in PHP and loaded via:
-		*  var message = acf._e('flickr', 'error');
-		*/
-		
-		$this->l10n = array(
-			'error'	=> __('Error! Please enter a higher value', 'acf-flickr'),
-		);
-		
 				
 		// do not delete!
     	parent::__construct();
@@ -85,8 +75,8 @@ class acf_field_flickr extends acf_field {
 	*/
 	
 	function render_field_options( $field ) {
-		
 		acf_render_field_option( $this->name, array(
+			'required'  => true,
 			'label'			=> __('Flickr User ID','acf-flickr'),
 			'instructions'	=> __('Find your User ID at','acf-flickr') . ' <a href="http://idgettr.com/">http://idgettr.com/</a>',
 			'type'			=> 'text',
@@ -95,6 +85,7 @@ class acf_field_flickr extends acf_field {
 		));
 
 		acf_render_field_option( $this->name, array(
+			'required'  => true,
 			'label'			=> __('Flickr API Key','acf-flickr'),
 			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
 			'type'			=> 'text',
@@ -139,8 +130,8 @@ class acf_field_flickr extends acf_field {
 			'name'         => 'flickr_cache_enabled',
 			'value'        => $field['flickr_cache_enabled'],
 			'choices'      => array(
-				'1' => 'yes',
-				'0' => 'no',
+				'1' => 'Yes',
+				'0' => 'No',
 			),
 		));
 
@@ -162,7 +153,9 @@ class acf_field_flickr extends acf_field {
 			'choices' 		 => array(
 				'square'     => '75x75 (square)',
 				'thumbnail'  => '100px (rectangle)',
-				'square_150' => '150x150 (square)',
+				'square_150' => '150x150 (square)',				
+				'small_240'  => '240px (rectangle)',
+				'small_320'  => '320px (rectangle)',
 			),
 		));
 		
@@ -425,72 +418,15 @@ class acf_field_flickr extends acf_field {
 		
 		$dir = plugin_dir_url( __FILE__ );
 		
-		
 		// register & include JS
-		wp_register_script( 'acf-input-flickr', "{$dir}js/input.js" );
-		wp_enqueue_script('acf-input-flickr');
-		
+		wp_register_script( 'acf-flickr-init', "{$dir}js/flickr-acf5.js" );
+		wp_enqueue_script('acf-flickr-init');
 		
 		// register & include CSS
 		wp_register_style( 'acf-input-flickr', "{$dir}css/input.css" ); 
 		wp_enqueue_style('acf-input-flickr');
 		
-		
 	}
-	
-	
-	
-	/*
-	*  input_admin_head()
-	*
-	*  This action is called in the admin_head action on the edit screen where your field is created.
-	*  Use this action to add CSS and JavaScript to assist your render_field() action.
-	*
-	*  @type	action (admin_head)
-	*  @since	3.6
-	*  @date	23/01/13
-	*
-	*  @param	n/a
-	*  @return	n/a
-	*/
-
-	/*
-		
-	function input_admin_head() {
-	
-		
-		
-	}
-	
-	*/
-	
-	
-	/*
-   	*  input_form_data()
-   	*
-   	*  This function is called once on the 'input' page between the head and footer
-   	*  There are 2 situations where ACF did not load during the 'acf/input_admin_enqueue_scripts' and 
-   	*  'acf/input_admin_head' actions because ACF did not know it was going to be used. These situations are
-   	*  seen on comments / user edit forms on the front end. This function will always be called, and includes
-   	*  $args that related to the current screen such as $args['post_id']
-   	*
-   	*  @type	function
-   	*  @date	6/03/2014
-   	*  @since	5.0.0
-   	*
-   	*  @param	$args (array)
-   	*  @return	n/a
-   	*/
-   	
-   	
-   	function input_form_data( $args ) {
-	   	
-		
-			echo '<pre>';
-			var_dump($args);	
-			echo '</pre>';
-   	}
-   	
 	
 	
 	/*

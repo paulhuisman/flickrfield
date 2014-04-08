@@ -8,6 +8,7 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 ## Notice
 
 - This add-on needs [Advanced Custom Fields](http://www.advancedcustomfields.com/).
+- When you update from ACF v4 to ACF v5; First disable the Flickr plugin, then disable ACF v4 and enable ACF v5. Don't forget to backup your data first.
 - I recommend using [Easy Fancybox](https://wordpress.org/plugins/easy-fancybox/) if you want to use a lightbox that's very easy to setup.
 
 ## Installation

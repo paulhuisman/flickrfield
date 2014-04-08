@@ -383,10 +383,7 @@ if ( !class_exists('phpFlickr') ) {
 			if (!array_key_exists($size, $sizes)) {
 				$size = "medium";
 			}
-			//var_dump($photo);exit;
-			// http://farm8.staticflickr.com/7113/7035203821_75c2b0b94d_o.jpg
-			// http://farm8.staticflickr.com/7113/7035203821_09d4158f08_o.jpg
-			// http://farm8.static.flickr.com/7113/7035203821_09d4158f08_o.jpg
+			
 			$url = "http://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['secret'] . $sizes[$size] . ".jpg";
 			
 			return $url;
