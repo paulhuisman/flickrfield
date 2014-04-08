@@ -2,6 +2,9 @@
 	overflow-y:auto; 
 	max-height:431px;
 }
+table.acf_input.acf_field_form_table {
+	border:0px;
+}
 .flickr_row { 
 	cursor:pointer; 
 }
@@ -17,6 +20,7 @@
 	background:#fff; 
 	border-top:1px solid #dfdfdf; 
 	padding:13px 13px 13px 15px; 
+	border-right: 1px solid #E1E1E1;
 }
 .flickr_row:hover .set_image,
 .active-row .label.set_image { 

@@ -1,9 +1,9 @@
-Flickr field for Advanced Custom Fields
+Flickr field for Advanced Custom Fields v4 and v5
 =============
 
 ## Description
 
-This is an add-on for the Advanced Custom Fields WordPress plugin that creates a list of all photos/sets/galleries from a specific Flickr user.
+The Flickr Field will grant you the ability to include photos, sets and galleries from your Flickr account. After selecting which image formats you wish to use the plugin will generate the flickr image urls. This plugin is an add-on for the Advanced Custom Fields WordPress plugin.
 
 ## Notice
 
@@ -12,8 +12,8 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 ## Installation
 
-1. Download or clone the ACF Flickr Field repo to your plugin directory by downloading https://github.com/phuisman88/flickrfield/zipball/master or cloning: git clone git://github.com/phuisman88/flickrfield.git  
-2. Enable the plugin in Wordpress.
+1. Download the ACF Flickr Field repo to your plugin directory by downloading https://github.com/phuisman88/flickrfield/zipball/master or clone it via git: git clone git://github.com/phuisman88/flickrfield.git  
+2. Enable the plugin in your Wordpress installation.
 3. Succes! You can now select a Flickr field when you create new custom fields.
 
 ## Usage Example (PHP)
@@ -22,6 +22,6 @@ This is an add-on for the Advanced Custom Fields WordPress plugin that creates a
 
 	if (isset($flickr['items'])) {
 		foreach ($flickr['items'] as $id => $photo) {
-			echo '<a href="' . $photo['large'] . '"><img src="' . $photo['thumb'] . '" /></a>';
+			echo '<a href="' . $photo['large'] . '" title="' . $photo['title'] . '"><img src="' . $photo['thumb'] . '" /></a>';
 		}
 	}

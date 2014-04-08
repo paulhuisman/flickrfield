@@ -2,28 +2,47 @@
 
 class acf_field_flickr extends acf_field {
 	
-	// vars
-	var $settings, // will hold info such as dir / path
-		$defaults; // will hold default field options
-		
-		
 	/*
 	*  __construct
 	*
-	*  Set name / label needed for actions / filters
+	*  This function will setup the field type data
 	*
-	*  @since	3.6
-	*  @date	23/01/13
+	*  @type	function
+	*  @date	5/03/2014
+	*  @since	5.0.0
+	*
+	*  @param	n/a
+	*  @return	n/a
 	*/
 	
-	function __construct()
-	{
-		// vars
+	function __construct() {
+		
+		/*
+		*  name (string) Single word, no spaces. Underscores allowed
+		*/
+		
 		$this->name = 'flickr';
-		$this->label = __('Flickr Field');
-		$this->category = __("Flickr", 'acf'); // Basic, Content, Choice, etc
+		
+		
+		/*
+		*  label (string) Multiple words, can include spaces, visible when selecting a field type
+		*/
+		
+		$this->label = __('Flickr Field', 'flickr');
+		
+		
+		/*
+		*  category (string) basic | content | choice | relational | jquery | layout | CUSTOM GROUP NAME
+		*/
+		
+		$this->category = 'Flickr';
+		
+		
+		/*
+		*  defaults (array) Array of default settings which are merged into the field object. These are used later in settings
+		*/
+		
 		$this->defaults = array(
-			// add default here to merge into your field. 
 			'flickr_api_key'        => '',
 			'flickr_user_id'        => '',
 			'flickr_content_type'   => 'sets',
@@ -35,213 +54,155 @@ class acf_field_flickr extends acf_field {
 		);
 		
 		
+		/*
+		*  l10n (array) Array of strings that are used in JavaScript. This allows JS strings to be translated in PHP and loaded via:
+		*  var message = acf._e('flickr', 'error');
+		*/
+		
+		$this->l10n = array(
+			'error'	=> __('Error! Please enter a higher value', 'acf-flickr'),
+		);
+		
+				
 		// do not delete!
     	parent::__construct();
     	
-    	
-    	// settings
-		$this->settings = array(
-			'path' => apply_filters('acf/helpers/get_path', __FILE__),
-			'dir' => apply_filters('acf/helpers/get_dir', __FILE__),
-			'version' => '1.0.0'
-		);
-
 	}
 	
 	
 	/*
-	*  create_options()
+	*  render_field_options()
 	*
-	*  Create extra options for your field. This is rendered when editing a field.
-	*  The value of $field['name'] can be used (like below) to save extra data to the $field
+	*  Create extra options for your field. These are visible when editing a field.
+	*  All parameters of `acf_render_field_option` can be changed except 'prefix'
 	*
 	*  @type	action
 	*  @since	3.6
 	*  @date	23/01/13
 	*
-	*  @param	$field	- an array holding all the field's data
+	*  @param	$field (array) the $field being edited
+	*  @return	n/a
 	*/
 	
-	function create_options( $field ) {
-		// defaults?
-		/*
-		$field = array_merge($this->defaults, $field);
-		*/
+	function render_field_options( $field ) {
 		
-		// key is needed in the field names to correctly save the data
-		$key = $field['name'];		
-		
-		// Create Fields
-		?>	
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e('Flickr User ID','acf-flickr'); ?><span class="required">*</span></label>
-				<p class="description">Find your User ID at <a href="http://idgettr.com/">http://idgettr.com/</a></p>
-			</td>
-			<td>
-				<?php		
-				do_action('acf/create_field', array(
-					'type'		=>	'text',
-					'name'		=>	'fields['.$key.'][flickr_user_id]',
-					'value'		=>	$field['flickr_user_id'],
-				));		
-				?>
-			</td>
-		</tr>
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e('Flickr API Key','acf-flickr'); ?><span class="required">*</span></label>
-				<p class="description"><?php _e('Find or register your API key at <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php		
-				do_action('acf/create_field', array(
-					'type'		=>	'text',
-					'name'		=>	'fields['.$key.'][flickr_api_key]',
-					'value'		=>	$field['flickr_api_key'],
-				));		
-				?>
-			</td>
-		</tr>	
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e( 'Type of content', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('Do you want to be able to select photos from the photostream or use sets/galleries that have already been created on Flickr?', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php
-				do_action('acf/create_field', array(
-					'type'	=>	'select',
-					'name'	=>	'fields['.$key.'][flickr_content_type]',
-					'value'	=>	$field['flickr_content_type'],
-					'choices' => array(
-						'sets'        => 'Sets',
-						'galleries'   => 'Galleries',
-						'photostream' => 'Photostream',
-					),
-				));
-				?>
-		   </td>
-		</tr>
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e( 'Display amount', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('How many sets/photos do you want to select from? The most recent items will be shown first.', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php
-				do_action('acf/create_field', array(
-					'type'	=>	'select',
-					'name'	=>	'fields['.$key.'][flickr_sets_amount]',
-					'value'	=>	$field['flickr_sets_amount'],
-					'choices' => array(
-						'10'   =>'10',
-						'20'   =>'20',
-						'30'   =>'30',
-						'40'   =>'40',
-						'50'   =>'50',
-						'100'  =>'100',
-						'9999' =>'Unlimited',
-					)
-				));
-				?>
-		   </td>
-		</tr>
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e( 'Enable cache', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('Once enabled, make sure the cache folder inside the flickr field plugin is writable.', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php
-				do_action('acf/create_field', array(
-					'type'	=>	'select',
-					'name'	=>	'fields['.$key.'][flickr_cache_enabled]',
-					'value'	=>	$field['flickr_cache_enabled'],
-					'choices' => array(
-						'1' => 'Yes',
-						'0' => 'No',
-					),
-				));
-				?>
-		   </td>
-		</tr>
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e('Cache duration','acf-flickr'); ?></label>
-				<p class="description"><?php _e('The time your cache may last in minutes (this setting will be ignored when your cache is disabled).', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php		
-				do_action('acf/create_field', array(
-					'type'		=>	'text',
-					'name'		=>	'fields['.$key.'][flickr_cache_duration]',
-					'value'		=>	$field['flickr_cache_duration'],
-				));		
-				?>
-			</td>
-		</tr>
+		acf_render_field_option( $this->name, array(
+			'label'			=> __('Flickr User ID','acf-flickr'),
+			'instructions'	=> __('Find your User ID at','acf-flickr') . ' <a href="http://idgettr.com/">http://idgettr.com/</a>',
+			'type'			=> 'text',
+			'name'			=> 'flickr_user_id',
+			'value'			=> $field['flickr_user_id'],
+		));
 
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e( 'Thumbnail size', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('The size of the photo thumbnail.', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php
-				do_action('acf/create_field', array(
-					'type'	=>	'select',
-					'name'	=>	'fields['.$key.'][flickr_thumb_size]',
-					'value'	=>	$field['flickr_thumb_size'],
-					'choices' => array(
-						'square'     => '75x75 (square)',
-						'thumbnail'  => '100px (rectangle)',
-						'square_150' => '150x150 (square)',
-					)
-				));
-				?>
-		   </td>
-		</tr>
-		<tr class="field_option field_option_<?php echo $this->name; ?>">
-			<td class="label">
-				<label><?php _e( 'Large size', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('The preferred width of the large photo.', 'acf-flickr');?></p>
-			</td>
-			<td>
-				<?php
-				do_action('acf/create_field', array(
-					'type'	=>	'select',
-					'name'	=>	'fields['.$key.'][flickr_large_size]',
-					'value'	=>	$field['flickr_large_size'],
-					'choices' => array(
-						'medium_640'   => '640px',
-						'medium_800'   => '800px',
-						'large_1024'   => '1024px',
-						//'large_1600'   => '1600px',
-						//'original'     => 'Original',
-					)
-				));
-				?>
-		   </td>
-		</tr>
-		<?php
+		acf_render_field_option( $this->name, array(
+			'label'			=> __('Flickr API Key','acf-flickr'),
+			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
+			'type'			=> 'text',
+			'name'			=> 'flickr_api_key',
+			'value'			=> $field['flickr_api_key'],
+		));	
+
+		acf_render_field_option( $this->name, array(
+			'label'			=> __('Type of content','acf-flickr'),
+			'instructions'	=> __('Do you want to be able to select photos from the photostream or use sets/galleries that have already been created on Flickr?','acf-flickr'),
+			'type'			=> 'select',
+			'name'			=> 'flickr_content_type',
+			'value'			=> $field['flickr_content_type'],
+			'choices' 	=> array(
+				'sets'        => 'Sets',
+				'galleries'   => 'Galleries',
+				'photostream' => 'Photostream',
+			),
+		));
 		
+		acf_render_field_option( $this->name, array(
+			'label'        => __('Display amount','acf-flickr'),
+			'instructions' => __('How many sets/photos do you want to select from? The most recent items will be shown first.','acf-flickr'),
+			'type'         => 'select',
+			'name'         => 'flickr_sets_amount',
+			'value'        => $field['flickr_sets_amount'],
+			'choices'      => array(
+				'10'   =>'10',
+				'20'   =>'20',
+				'30'   =>'30',
+				'40'   =>'40',
+				'50'   =>'50',
+				'100'  =>'100',
+				'9999' =>'Unlimited',
+			),
+		));
+		
+		acf_render_field_option( $this->name, array(
+			'label'        => __('Enable cache','acf-flickr'),
+			'instructions' => __('Once enabled, make sure the cache folder inside the flickr field plugin is writable.','acf-flickr'),
+			'type'         => 'select',
+			'name'         => 'flickr_cache_enabled',
+			'value'        => $field['flickr_cache_enabled'],
+			'choices'      => array(
+				'1' => 'yes',
+				'0' => 'no',
+			),
+		));
+
+		acf_render_field_option( $this->name, array(
+			'label'        => __('Cache duration','acf-flickr'),
+			'instructions' => __('The time your cache may last in minutes (this setting will be ignored when your cache is disabled).','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
+			'type'         => 'text',
+			'name'         => 'flickr_cache_duration',
+			'value'        => $field['flickr_cache_duration'],
+			'append'       => 'minutes',
+		));	
+
+		acf_render_field_option( $this->name, array(
+			'label'        => __('Thumbnail size','acf-flickr'),
+			'instructions' => __('The preferred size of the photo thumbnail.','acf-flickr'),
+			'type'         => 'select',
+			'name'         => 'flickr_thumb_size',
+			'value'        => $field['flickr_thumb_size'],
+			'choices' 		 => array(
+				'square'     => '75x75 (square)',
+				'thumbnail'  => '100px (rectangle)',
+				'square_150' => '150x150 (square)',
+			),
+		));
+		
+		acf_render_field_option( $this->name, array(
+			'label'        => __('Large size','acf-flickr'),
+			'instructions' => __('The preferred size of the enlargment of the photo.','acf-flickr'),
+			'type'         => 'select',
+			'name'         => 'flickr_large_size',
+			'value'        => $field['flickr_large_size'],
+			'choices' 		 => array(
+				'medium_640'   => '640px',
+				'medium_800'   => '800px',
+				'large_1024'   => '1024px',
+				//'large_1600'   => '1600px',
+				//'original'     => 'Original',
+			),
+		));
+		
+		
+
 	}
 	
 	
+	
 	/*
-	*  create_field()
+	*  render_field()
 	*
 	*  Create the HTML interface for your field
 	*
-	*  @param	$field - an array holding all the field's data
+	*  @param	$field (array) the $field being rendered
 	*
 	*  @type	action
 	*  @since	3.6
 	*  @date	23/01/13
+	*
+	*  @param	$field (array) the $field being edited
+	*  @return	n/a
 	*/
 	
-	function create_field( $field ) {
+	function render_field( $field ) {
 		// Defaults
 		$field['value'] = isset($field['value']) ? $field['value'] : array();
 		$field['optgroup'] = isset($field['optgroup']) ? $field['optgroup'] : false;
@@ -445,71 +406,180 @@ class acf_field_flickr extends acf_field {
 		echo '</select>';
 		
 	}
-	
-	
+		
 	/*
 	*  input_admin_enqueue_scripts()
 	*
 	*  This action is called in the admin_enqueue_scripts action on the edit screen where your field is created.
-	*  Use this action to add CSS + JavaScript to assist your create_field() action.
+	*  Use this action to add CSS + JavaScript to assist your render_field() action.
 	*
-	*  $info	http://codex.wordpress.org/Plugin_API/Action_Reference/admin_enqueue_scripts
-	*  @type	action
+	*  @type	action (admin_enqueue_scripts)
 	*  @since	3.6
 	*  @date	23/01/13
+	*
+	*  @param	n/a
+	*  @return	n/a
 	*/
 
-	function input_admin_enqueue_scripts()
-	{
-		// register ACF scripts
-		wp_register_script( 'acf-input-flickr', $this->settings['dir'] . 'js/input.js', array('acf-input'), $this->settings['version'] );
-		wp_register_style( 'acf-input-flickr', $this->settings['dir'] . 'css/input.css', array('acf-input'), $this->settings['version'] ); 
+	function input_admin_enqueue_scripts() {
+		
+		$dir = plugin_dir_url( __FILE__ );
 		
 		
-		// scripts
-		wp_enqueue_script(array(
-			'acf-input-flickr',	
-		));
-
-		// styles
-		wp_enqueue_style(array(
-			'acf-input-flickr',	
-		));
+		// register & include JS
+		wp_register_script( 'acf-input-flickr', "{$dir}js/input.js" );
+		wp_enqueue_script('acf-input-flickr');
+		
+		
+		// register & include CSS
+		wp_register_style( 'acf-input-flickr', "{$dir}css/input.css" ); 
+		wp_enqueue_style('acf-input-flickr');
 		
 		
 	}
+	
+	
+	
+	/*
+	*  input_admin_head()
+	*
+	*  This action is called in the admin_head action on the edit screen where your field is created.
+	*  Use this action to add CSS and JavaScript to assist your render_field() action.
+	*
+	*  @type	action (admin_head)
+	*  @since	3.6
+	*  @date	23/01/13
+	*
+	*  @param	n/a
+	*  @return	n/a
+	*/
+
+	/*
+		
+	function input_admin_head() {
+	
+		
+		
+	}
+	
+	*/
+	
+	
+	/*
+   	*  input_form_data()
+   	*
+   	*  This function is called once on the 'input' page between the head and footer
+   	*  There are 2 situations where ACF did not load during the 'acf/input_admin_enqueue_scripts' and 
+   	*  'acf/input_admin_head' actions because ACF did not know it was going to be used. These situations are
+   	*  seen on comments / user edit forms on the front end. This function will always be called, and includes
+   	*  $args that related to the current screen such as $args['post_id']
+   	*
+   	*  @type	function
+   	*  @date	6/03/2014
+   	*  @since	5.0.0
+   	*
+   	*  @param	$args (array)
+   	*  @return	n/a
+   	*/
+   	
+   	
+   	function input_form_data( $args ) {
+	   	
+		
+			echo '<pre>';
+			var_dump($args);	
+			echo '</pre>';
+   	}
+   	
+	
+	
+	/*
+	*  input_admin_footer()
+	*
+	*  This action is called in the admin_footer action on the edit screen where your field is created.
+	*  Use this action to add CSS and JavaScript to assist your render_field() action.
+	*
+	*  @type	action (admin_footer)
+	*  @since	3.6
+	*  @date	23/01/13
+	*
+	*  @param	n/a
+	*  @return	n/a
+	*/
+
+	/*
+		
+	function input_admin_footer() {
+	
+		
+		
+	}
+	
+	*/
 	
 	
 	/*
 	*  field_group_admin_enqueue_scripts()
 	*
 	*  This action is called in the admin_enqueue_scripts action on the edit screen where your field is edited.
-	*  Use this action to add CSS + JavaScript to assist your create_field_options() action.
+	*  Use this action to add CSS + JavaScript to assist your render_field_options() action.
 	*
-	*  $info	http://codex.wordpress.org/Plugin_API/Action_Reference/admin_enqueue_scripts
-	*  @type	action
+	*  @type	action (admin_enqueue_scripts)
 	*  @since	3.6
 	*  @date	23/01/13
+	*
+	*  @param	n/a
+	*  @return	n/a
 	*/
+
+	/*
+	
+	function field_group_admin_enqueue_scripts() {
+		
+	}
+	
+	*/
+
+	
+	/*
+	*  field_group_admin_head()
+	*
+	*  This action is called in the admin_head action on the edit screen where your field is edited.
+	*  Use this action to add CSS and JavaScript to assist your render_field_options() action.
+	*
+	*  @type	action (admin_head)
+	*  @since	3.6
+	*  @date	23/01/13
+	*
+	*  @param	n/a
+	*  @return	n/a
+	*/
+
+	/*
+	
+	function field_group_admin_head() {
+	
+	}
+	
+	*/
+
 
 	/*
 	*  load_value()
 	*
-		*  This filter is applied to the $value after it is loaded from the db
+	*  This filter is applied to the $value after it is loaded from the db
 	*
 	*  @type	filter
 	*  @since	3.6
 	*  @date	23/01/13
 	*
-	*  @param	$value - the value found in the database
-	*  @param	$post_id - the $post_id from which the value was loaded
-	*  @param	$field - the field array holding all the field options
-	*
-	*  @return	$value - the value to be saved in the database
+	*  @param	$value (mixed) the value found in the database
+	*  @param	$post_id (mixed) the $post_id from which the value was loaded
+	*  @param	$field (array) the field array holding all the field options
+	*  @return	$value
 	*/
-	
-	function load_value( $value, $post_id, $field )
-	{
+
+	function load_value( $value, $post_id, $field ) {
 		$data = array();
 
 		$data['items']      = $value;
@@ -520,80 +590,60 @@ class acf_field_flickr extends acf_field {
 		$data['api_key']    = $field['flickr_api_key'];
 
 		return $data;
+		
 	}
+	
 	
 	
 	/*
 	*  update_value()
 	*
-	*  This filter is applied to the $value before it is updated in the db
+	*  This filter is applied to the $value before it is saved in the db
 	*
 	*  @type	filter
 	*  @since	3.6
 	*  @date	23/01/13
 	*
-	*  @param	$value - the value which will be saved in the database
-	*  @param	$post_id - the $post_id of which the value will be saved
-	*  @param	$field - the field array holding all the field options
-	*
-	*  @return	$value - the modified value
+	*  @param	$value (mixed) the value found in the database
+	*  @param	$post_id (mixed) the $post_id from which the value was loaded
+	*  @param	$field (array) the field array holding all the field options
+	*  @return	$value
 	*/
 	
-	function update_value( $value, $post_id, $field )
-	{
-		// Note: This function can be removed if not used
+	/*
+	
+	function update_value( $value, $post_id, $field ) {
+		
 		return $value;
+		
 	}
+	
+	*/
 	
 	
 	/*
 	*  format_value()
 	*
-	*  This filter is applied to the $value after it is loaded from the db and before it is passed to the create_field action
+	*  This filter is applied to the $value after it is loaded from the db and before it is passed to the render_field() function
 	*
 	*  @type	filter
 	*  @since	3.6
 	*  @date	23/01/13
 	*
-	*  @param	$value	- the value which was loaded from the database
-	*  @param	$post_id - the $post_id from which the value was loaded
-	*  @param	$field	- the field array holding all the field options
-	*
-	*  @return	$value	- the modified value
+	*  @param	$value (mixed) the value which was loaded from the database
+	*  @param	$post_id (mixed) the $post_id from which the value was loaded
+	*  @param	$field (array) the field array holding all the field options
+	*  @param	$template (boolean) true if value requires formatting for front end template function
+	*  @return	$value
 	*/
-	
-	function format_value( $value, $post_id, $field )
-	{
-		// defaults?
-		/*
-		$field = array_merge($this->defaults, $field);
-		*/
 		
-		// perhaps use $field['preview_size'] to alter the $value?
-		
-		// Note: This function can be removed if not used
-		return $value;
-	}
 	
-	
-	/*
-	*  format_value_for_api()
-	*
-	*  This filter is applied to the $value after it is loaded from the db and before it is passed back to the API functions such as the_field
-	*
-	*  @type	filter
-	*  @since	3.6
-	*  @date	23/01/13
-	*
-	*  @param	$value	- the value which was loaded from the database
-	*  @param	$post_id - the $post_id from which the value was loaded
-	*  @param	$field	- the field array holding all the field options
-	*
-	*  @return	$value	- the modified value
-	*/
-	
-	function format_value_for_api( $value, $post_id, $field )
-	{
+	function format_value( $value, $post_id, $field, $template ) {
+		// bail early if not template function such as get_field()
+		if( !$template ) {
+			return $value;
+		}
+
 		if (!empty($value['items'])) {
 			// Decode JSON format that is used in the database 
 			$value['items'] = json_decode($value['items']);
@@ -648,6 +698,75 @@ class acf_field_flickr extends acf_field {
 		return $value;
 	}
 	
+	/*
+	*  validate_value()
+	*
+	*  This filter is used to perform validation on the value prior to saving.
+	*  All values are validated regardless of the field's required setting. This allows you to validate and return
+	*  messages to the user if the value is not correct
+	*
+	*  @type	filter
+	*  @date	11/02/2014
+	*  @since	5.0.0
+	*
+	*  @param	$valid (boolean) validation status based on the value and the field's required setting
+	*  @param	$value (mixed) the $_POST value
+	*  @param	$field (array) the field array holding all the field options
+	*  @param	$input (string) the corresponding input name for $_POST value
+	*  @return	$valid
+	*/
+	
+	/*
+	
+	function validate_value( $valid, $value, $field, $input ){
+		
+		// Basic usage
+		if( $value < $field['custom_minimum_setting'] )
+		{
+			$valid = false;
+		}
+		
+		
+		// Advanced usage
+		if( $value < $field['custom_minimum_setting'] )
+		{
+			$valid = __('The value is too little!','acf-flickr'),
+		}
+		
+		
+		// return
+		return $valid;
+		
+	}
+	
+	*/
+	
+	
+	/*
+	*  delete_value()
+	*
+	*  This action is fired after a value has been deleted from the db.
+	*  Please note that saving a blank value is treated as an update, not a delete
+	*
+	*  @type	action
+	*  @date	6/03/2014
+	*  @since	5.0.0
+	*
+	*  @param	$post_id (mixed) the $post_id from which the value was deleted
+	*  @param	$key (string) the $meta_key which the value was deleted
+	*  @return	n/a
+	*/
+	
+	/*
+	
+	function delete_value( $post_id, $key ) {
+		
+		
+		
+	}
+	
+	*/
+	
 	
 	/*
 	*  load_field()
@@ -655,19 +774,22 @@ class acf_field_flickr extends acf_field {
 	*  This filter is applied to the $field after it is loaded from the database
 	*
 	*  @type	filter
-	*  @since	3.6
-	*  @date	23/01/13
+	*  @date	23/01/2013
+	*  @since	3.6.0	
 	*
-	*  @param	$field - the field array holding all the field options
-	*
-	*  @return	$field - the field array holding all the field options
+	*  @param	$field (array) the field array holding all the field options
+	*  @return	$field
 	*/
 	
-	function load_field( $field )
-	{
-		// Note: This function can be removed if not used
+	/*
+	
+	function load_field( $field ) {
+		
 		return $field;
-	}
+		
+	}	
+	
+	*/
 	
 	
 	/*
@@ -676,21 +798,46 @@ class acf_field_flickr extends acf_field {
 	*  This filter is applied to the $field before it is saved to the database
 	*
 	*  @type	filter
-	*  @since	3.6
-	*  @date	23/01/13
+	*  @date	23/01/2013
+	*  @since	3.6.0
 	*
-	*  @param	$field - the field array holding all the field options
-	*  @param	$post_id - the field group ID (post_type = acf)
-	*
-	*  @return	$field - the modified field
+	*  @param	$field (array) the field array holding all the field options
+	*  @return	$field
 	*/
-
-	function update_field( $field, $post_id )
-	{
-		// Note: This function can be removed if not used
+	
+	/*
+	
+	function update_field( $field ) {
+		
 		return $field;
-	}
-
+		
+	}	
+	
+	*/
+	
+	
+	/*
+	*  delete_field()
+	*
+	*  This action is fired after a field is deleted from the database
+	*
+	*  @type	action
+	*  @date	11/02/2014
+	*  @since	5.0.0
+	*
+	*  @param	$field (array) the field array holding all the field options
+	*  @return	n/a
+	*/
+	
+	/*
+	
+	function delete_field( $field ) {
+		
+		
+		
+	}	
+	
+	*/
 	
 }
 
