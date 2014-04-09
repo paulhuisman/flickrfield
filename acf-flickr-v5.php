@@ -35,7 +35,7 @@ class acf_field_flickr extends acf_field {
 		*  category (string) basic | content | choice | relational | jquery | layout | CUSTOM GROUP NAME
 		*/
 		
-		$this->category = 'Flickr';
+		$this->category = 'content';
 		
 		
 		/*
@@ -82,6 +82,7 @@ class acf_field_flickr extends acf_field {
 			'type'			=> 'text',
 			'name'			=> 'flickr_user_id',
 			'value'			=> $field['flickr_user_id'],
+			'prefix'		=> $field['prefix'],
 		));
 
 		acf_render_field_option( $this->name, array(
@@ -91,6 +92,7 @@ class acf_field_flickr extends acf_field {
 			'type'			=> 'text',
 			'name'			=> 'flickr_api_key',
 			'value'			=> $field['flickr_api_key'],
+			'prefix'		=> $field['prefix'],
 		));	
 
 		acf_render_field_option( $this->name, array(
@@ -99,6 +101,7 @@ class acf_field_flickr extends acf_field {
 			'type'			=> 'select',
 			'name'			=> 'flickr_content_type',
 			'value'			=> $field['flickr_content_type'],
+			'prefix'		=> $field['prefix'],
 			'choices' 	=> array(
 				'sets'        => 'Sets',
 				'galleries'   => 'Galleries',
@@ -112,6 +115,7 @@ class acf_field_flickr extends acf_field {
 			'type'         => 'select',
 			'name'         => 'flickr_sets_amount',
 			'value'        => $field['flickr_sets_amount'],
+			'prefix'		   => $field['prefix'],
 			'choices'      => array(
 				'10'   =>'10',
 				'20'   =>'20',
@@ -129,6 +133,7 @@ class acf_field_flickr extends acf_field {
 			'type'         => 'select',
 			'name'         => 'flickr_cache_enabled',
 			'value'        => $field['flickr_cache_enabled'],
+			'prefix'		=> $field['prefix'],
 			'choices'      => array(
 				'1' => 'Yes',
 				'0' => 'No',
@@ -142,6 +147,7 @@ class acf_field_flickr extends acf_field {
 			'name'         => 'flickr_cache_duration',
 			'value'        => $field['flickr_cache_duration'],
 			'append'       => 'minutes',
+			'prefix'		=> $field['prefix'],
 		));	
 
 		acf_render_field_option( $this->name, array(
@@ -150,6 +156,7 @@ class acf_field_flickr extends acf_field {
 			'type'         => 'select',
 			'name'         => 'flickr_thumb_size',
 			'value'        => $field['flickr_thumb_size'],
+			'prefix'		   => $field['prefix'],
 			'choices' 		 => array(
 				'square'     => '75x75 (square)',
 				'thumbnail'  => '100px (rectangle)',
@@ -165,6 +172,7 @@ class acf_field_flickr extends acf_field {
 			'type'         => 'select',
 			'name'         => 'flickr_large_size',
 			'value'        => $field['flickr_large_size'],
+			'prefix'		   => $field['prefix'],
 			'choices' 		 => array(
 				'medium_640'   => '640px',
 				'medium_800'   => '800px',

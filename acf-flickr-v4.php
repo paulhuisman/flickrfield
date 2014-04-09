@@ -21,7 +21,7 @@ class acf_field_flickr extends acf_field {
 		// vars
 		$this->name = 'flickr';
 		$this->label = __('Flickr Field');
-		$this->category = __("Flickr", 'acf'); // Basic, Content, Choice, etc
+		$this->category = __("Content", 'acf'); // Basic, Content, Choice, etc
 		$this->defaults = array(
 			// add default here to merge into your field. 
 			'flickr_api_key'        => '',
