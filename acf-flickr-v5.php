@@ -126,10 +126,18 @@ class acf_field_flickr extends acf_field {
 				'9999' =>'Unlimited',
 			),
 		));
-		
+
+		$cache_dir = dirname(__FILE__) . '/cache';
+		if (!	is_writeable($cache_dir)) {
+			$instructions = __('The cache folder <em>'. $cache_dir . '</em> is <span style="color:#CC0000; font-weight:bold">not writable</span>. Make sure cache can be used by executing <i>sudo chmod 777</i> on the cache folder.', 'acf-filckr');
+		}
+		else {
+			$instructions = __('<span style="color:#336600">' . __('The cache folder is writable!', 'acf-flickr') . '</span>';
+		}
+				
 		acf_render_field_option( $this->name, array(
 			'label'        => __('Enable cache','acf-flickr'),
-			'instructions' => __('Once enabled, make sure the cache folder inside the flickr field plugin is writable.','acf-flickr'),
+			'instructions' => $instructions,
 			'type'         => 'select',
 			'name'         => 'flickr_cache_enabled',
 			'value'        => $field['flickr_cache_enabled'],

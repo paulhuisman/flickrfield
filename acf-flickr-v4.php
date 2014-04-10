@@ -153,11 +153,11 @@ class acf_field_flickr extends acf_field {
 				<p class="description">
 					<?php 
 					$cache_dir = dirname(__FILE__) . '/cache';
-					if (!	is_writeable($cache_dir)) {
-						echo _e('The cache folder <em>'. $cache_dir . '</em> is <b>not writable</b>. Make sure cache files can be written by using <i>sudo chmod 775</i> on the cache folder.', 'acf-filckr');
+					if (!	is_writeable($cache_dir)) {			
+						echo __('The cache folder <em>'. $cache_dir . '</em> is <span style="color:#CC0000; font-weight:bold">not writable</span>. Make sure cache can be used by executing <i>sudo chmod 777</i> on the cache folder.', 'acf-flickr');
 					}
 					else {
-						echo _e('The cache folder is writable!');
+						echo '<span style="color:#336600">' . __('The cache folder is writable!', 'acf-flickr') . '</span>';
 					}
 					?>
 				</p>
