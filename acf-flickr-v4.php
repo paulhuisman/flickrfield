@@ -150,7 +150,17 @@ class acf_field_flickr extends acf_field {
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
 				<label><?php _e( 'Enable cache', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('Once enabled, make sure the cache folder inside the flickr field plugin is writable.', 'acf-flickr');?></p>
+				<p class="description">
+					<?php 
+					$cache_dir = dirname(__FILE__) . '/cache';
+					if (!	is_writeable($cache_dir)) {
+						echo _e('The cache folder <em>'. $cache_dir . '</em> is <b>not writable</b>. Make sure cache files can be written by using <i>sudo chmod 775</i> on the cache folder.', 'acf-filckr');
+					}
+					else {
+						echo _e('The cache folder is writable!');
+					}
+					?>
+				</p>
 			</td>
 			<td>
 				<?php
