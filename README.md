@@ -19,7 +19,7 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 
 ## Usage Example (in PHP)
 
-### Getting the contents of a photostream and looping through the results
+**Getting the contents of a photostream and looping through the results**
 
 	$flickr_photostream = get_field(FIELD_NAME);
 
@@ -29,7 +29,7 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 		}
 	}
 
-### Getting the contents of a set and looping through the results
+**Getting the contents of a set and looping through the results**
 
 	$flickr_set = get_field(FIELD_NAME);
 
