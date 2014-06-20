@@ -17,7 +17,9 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 2. Enable the plugin in your Wordpress installation.
 3. Succes! You can now select a Flickr field when you create new custom fields.
 
-## Usage Example for Photostream (PHP)
+## Usage Example (in PHP)
+
+### Getting the contents of a photostream and looping through the results
 
 	$flickr_photostream = get_field(FIELD_NAME);
 
@@ -27,7 +29,7 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 		}
 	}
 
-## Usage Example for Photo Set (PHP)
+### Getting the contents of a set and looping through the results
 
 	$flickr_set = get_field(FIELD_NAME);
 
