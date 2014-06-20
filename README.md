@@ -29,10 +29,10 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 
 ## Usage Example for Photo Set (PHP)
 
-	$flickr_sets = get_field(FIELD_NAME);
+	$flickr_set = get_field(FIELD_NAME);
 
-	if (isset($flickr_sets['items'])) {
-		foreach ($flickr_sets['items'] as $id => $photos) {
+	if (isset($flickr_set['items'])) {
+		foreach ($flickr_set['items'] as $id => $photos) {
 			foreach ($photos as $photo) {
 				echo '<a href="' . $photo['large'] . '" title="' . $photo['title'] . '"><img src="' . $photo['thumb'] . '" /></a>';
 			}
