@@ -1,26 +1,9 @@
 (function($){
 
-
 	function initialize_flickrfield( $el ) {
 
 		$('.field_form.flickr_field').each(function() {
-			var self = $(this).parent(),
-				input;
-			
-			$('select option:selected', self).each(function() {
-				value = $(this).val();
-			});
-
-			$('.flickr_row', self).click(function(e) {
-				e.preventDefault();
-				// Deselect if active
-				if ($(this).hasClass('active-row')) {
-					$(this).removeClass('active-row');
-				}
-				else {
-					$(this).addClass('active-row');
-				}
-
+			function fill_input_value() {
 				var active_items = new Array();
 
 				$('.flickr_row.active-row').each(function() {
@@ -39,10 +22,29 @@
 					
 				});
 
-				// Create a JSON array so we can save the selected data to a single field in the database
 				if (active_items.length > 0) {
 					input.val(JSON.stringify(active_items));
 				}
+			} 
+
+			var self = $(this).parent(),
+				input;
+			
+			$('select option:selected', self).each(function() {
+				value = $(this).val();
+			});
+
+			$('.flickr_row', self).click(function(e) {
+				e.preventDefault();
+				// Deselect if active
+				if ($(this).hasClass('active-row')) {
+					$(this).removeClass('active-row');
+				}
+				else {
+					$(this).addClass('active-row');
+				}
+
+				fill_input_value();
 			});
 			
 			// Make hidden input with flickr data
@@ -50,6 +52,8 @@
 
 			// Remove default select
 			$('select', self).after(input).remove();	
+			
+			fill_input_value();
 		});
 	
 	}
