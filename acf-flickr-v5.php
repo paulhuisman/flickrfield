@@ -55,7 +55,7 @@ class acf_field_flickr extends acf_field {
 		
 				
 		// do not delete!
-    	parent::__construct();
+    parent::__construct();
     	
 	}
 	
@@ -74,34 +74,28 @@ class acf_field_flickr extends acf_field {
 	*  @return	n/a
 	*/
 	
-	function render_field_options( $field ) {
-		acf_render_field_option( $this->name, array(
+	function render_field_settings( $field ) {
+		acf_render_field_setting( $field, array(
 			'required'  => true,
 			'label'			=> __('Flickr User ID','acf-flickr'),
 			'instructions'	=> __('Find your User ID at','acf-flickr') . ' <a href="http://idgettr.com/">http://idgettr.com/</a>',
 			'type'			=> 'text',
 			'name'			=> 'flickr_user_id',
-			'value'			=> $field['flickr_user_id'],
-			'prefix'		=> $field['prefix'],
 		));
 
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'required'  => true,
 			'label'			=> __('Flickr API Key','acf-flickr'),
 			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
 			'type'			=> 'text',
 			'name'			=> 'flickr_api_key',
-			'value'			=> $field['flickr_api_key'],
-			'prefix'		=> $field['prefix'],
 		));	
 
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'label'			=> __('Type of content','acf-flickr'),
 			'instructions'	=> __('Do you want to be able to select photos from the photostream or use sets/galleries that have already been created on Flickr?','acf-flickr'),
 			'type'			=> 'select',
 			'name'			=> 'flickr_content_type',
-			'value'			=> $field['flickr_content_type'],
-			'prefix'		=> $field['prefix'],
 			'choices' 	=> array(
 				'sets'        => 'Sets',
 				'galleries'   => 'Galleries',
@@ -109,13 +103,11 @@ class acf_field_flickr extends acf_field {
 			),
 		));
 		
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'label'        => __('Display amount','acf-flickr'),
 			'instructions' => __('How many sets/photos do you want to select from? The most recent items will be shown first.','acf-flickr'),
 			'type'         => 'select',
 			'name'         => 'flickr_sets_amount',
-			'value'        => $field['flickr_sets_amount'],
-			'prefix'		   => $field['prefix'],
 			'choices'      => array(
 				'10'   =>'10',
 				'20'   =>'20',
@@ -132,39 +124,33 @@ class acf_field_flickr extends acf_field {
 			$instructions = __('The cache folder <em>'. $cache_dir . '</em> is <span style="color:#CC0000; font-weight:bold">not writable</span>. Make sure cache can be used by executing <i>sudo chmod 777</i> on the cache folder.', 'acf-filckr');
 		}
 		else {
-			$instructions = __('<span style="color:#336600">' . __('The cache folder is writable!', 'acf-flickr') . '</span>';
+			$instructions = '<span style="color:#336600">' . __('The cache folder is writable!', 'acf-flickr') . '</span>';
 		}
 				
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'label'        => __('Enable cache','acf-flickr'),
 			'instructions' => $instructions,
 			'type'         => 'select',
 			'name'         => 'flickr_cache_enabled',
-			'value'        => $field['flickr_cache_enabled'],
-			'prefix'		=> $field['prefix'],
 			'choices'      => array(
 				'1' => 'Yes',
 				'0' => 'No',
 			),
 		));
 
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'label'        => __('Cache duration','acf-flickr'),
 			'instructions' => __('The time your cache may last in minutes (this setting will be ignored when your cache is disabled).','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
 			'type'         => 'text',
 			'name'         => 'flickr_cache_duration',
-			'value'        => $field['flickr_cache_duration'],
 			'append'       => 'minutes',
-			'prefix'		=> $field['prefix'],
 		));	
 
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'label'        => __('Thumbnail size','acf-flickr'),
 			'instructions' => __('The preferred size of the photo thumbnail.','acf-flickr'),
 			'type'         => 'select',
 			'name'         => 'flickr_thumb_size',
-			'value'        => $field['flickr_thumb_size'],
-			'prefix'		   => $field['prefix'],
 			'choices' 		 => array(
 				'square'     => '75x75 (square)',
 				'thumbnail'  => '100px (rectangle)',
@@ -174,13 +160,11 @@ class acf_field_flickr extends acf_field {
 			),
 		));
 		
-		acf_render_field_option( $this->name, array(
+		acf_render_field_setting( $field, array(
 			'label'        => __('Large size','acf-flickr'),
 			'instructions' => __('The preferred size of the enlargment of the photo.','acf-flickr'),
 			'type'         => 'select',
 			'name'         => 'flickr_large_size',
-			'value'        => $field['flickr_large_size'],
-			'prefix'		   => $field['prefix'],
 			'choices' 		 => array(
 				'medium_640'   => '640px',
 				'medium_800'   => '800px',
@@ -590,12 +574,11 @@ class acf_field_flickr extends acf_field {
 	*/
 		
 	
-	function format_value( $value, $post_id, $field, $template ) {
-		// bail early if not template function such as get_field()
-		if( !$template ) {
+	function format_value( $value, $post_id, $field ) {
+		// bail early if no value
+		if( empty($value)) {
 			return $value;
 		}
-
 		if (!empty($value['items'])) {
 			// Decode JSON format that is used in the database 
 			$value['items'] = json_decode($value['items']);
@@ -634,7 +617,8 @@ class acf_field_flickr extends acf_field {
 				$value['items'] = $sets;
 			}
 			elseif($value['type'] == 'photostream') {
-
+				$items = array();
+				
 				foreach($value['items'] as $photo) {				
 					$items[] = array(
 						'title'    => $photo->title,
