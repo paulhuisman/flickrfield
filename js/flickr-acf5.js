@@ -23,6 +23,8 @@
 
 			if (active_items.length > 0) {
 				input.val(JSON.stringify(active_items));
+			} else {
+				input.val('');
 			}
 		} 
 
