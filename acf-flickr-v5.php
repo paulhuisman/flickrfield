@@ -170,7 +170,7 @@ class acf_field_flickr extends acf_field {
 				'medium_800'   => '800px',
 				'large_1024'   => '1024px',
 				//'large_1600'   => '1600px',
-				//'original'     => 'Original',
+				'original'     => 'Original',
 			),
 		));
 		
@@ -283,8 +283,7 @@ class acf_field_flickr extends acf_field {
 			<?php
 			}
 			elseif($field['flickr_content_type'] == 'photostream') {
-				$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, NULL, $field['flickr_sets_amount'], '');
-			
+				$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, 'url_o', $field['flickr_sets_amount'], '');
 				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
 					<ul class="field_label photostream">
 						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
@@ -305,6 +304,7 @@ class acf_field_flickr extends acf_field {
 								data-flickr-secret="<?php echo $photo['secret']; ?>"
 								data-flickr-farm="<?php echo $photo['farm']; ?>"
 								data-flickr-title="<?php echo $photo['title']; ?>"
+								data-flickr-original-url="<?php echo $photo['url_o']; ?>"
 								>
 								<img title="<?php echo $photo['title'];?>" src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
 							</li>
@@ -599,18 +599,18 @@ class acf_field_flickr extends acf_field {
 				$sets = array();
 				foreach($value['items'] as $id) {
 					if ($value['type'] == 'sets') {
-						$photos = $f->photosets_getPhotos($id);
+						$photos = $f->photosets_getPhotos($id, 'url_o');
 						$name = 'photoset';
 					} 
 					elseif ($value['type'] == 'galleries') {
-						$photos = $f->galleries_getPhotos($id);
+						$photos = $f->galleries_getPhotos($id, 'url_o');
 						$name = 'photos';
 					}
 					// Loop through all photos and create a thumb and large url
 					foreach ($photos[$name]['photo'] as $photo) {
 						$sets[$id][$photo['id']]['title']    = $photo['title'];
 						$sets[$id][$photo['id']]['thumb']    = $f->buildPhotoURL($photo, $value['thumb_size']);
-						$sets[$id][$photo['id']]['large']    = $f->buildPhotoURL($photo, $value['large_size']);
+						$sets[$id][$photo['id']]['large']    = ($value['large_size'] == 'original') ? $photo['url_o'] : $f->buildPhotoURL($photo, $value['large_size']);
 						$sets[$id][$photo['id']]['photo_id'] = $photo['id'];
 					}	
 				}
@@ -619,11 +619,11 @@ class acf_field_flickr extends acf_field {
 			elseif($value['type'] == 'photostream') {
 				$items = array();
 				
-				foreach($value['items'] as $photo) {				
+				foreach($value['items'] as $photo) {		
 					$items[] = array(
 						'title'    => $photo->title,
 						'thumb'    => $f->buildPhotoURL($photo, $value['thumb_size']),
-						'large'    => $f->buildPhotoURL($photo, $value['large_size']),
+						'large'    => ($value['large_size'] == 'original') ? $photo->original_url : $f->buildPhotoURL($photo, $value['large_size']),
 						'photo_id' => $photo->id,
 					);
 				}

@@ -12,7 +12,8 @@
 						server: $(this).attr('data-flickr-server'), 
 						secret: $(this).attr('data-flickr-secret'), 
 						farm: $(this).attr('data-flickr-farm'), 
-						title: $(this).attr('data-flickr-title')
+						title: $(this).attr('data-flickr-title'),
+						original_url: $(this).attr('data-flickr-original-url')
 					});	
 				} 
 				else {
