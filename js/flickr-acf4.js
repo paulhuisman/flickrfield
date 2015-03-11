@@ -1,6 +1,11 @@
 (function($){
 
 	function initialize_flickrfield( $el ) {
+		var max_selected_amount = $('select', $el).data('max-selectable');
+		if(max_selected_amount == '') {
+			max_selected_amount = 0;
+		}
+		var flickr_type = $('select', $el).data('flickr-type');
 
 		function fill_input_value() {
 			var active_items = new Array();
@@ -37,11 +42,17 @@
 
 		$('.flickr_row', $el).click(function(e) {
 			e.preventDefault();
+
 			// Deselect if active
 			if ($(this).hasClass('active-row')) {
 				$(this).removeClass('active-row');
 			}
 			else {
+				// Check if the maximum selectable amount of items has been passed
+				if(max_selected_amount != 0 && $('.active-row', $el).length >= max_selected_amount) {
+					alert('The maximum selectable amount of ' + flickr_type + ' is ' + max_selected_amount + '.');
+					return;
+				}
 				$(this).addClass('active-row');
 			}
 

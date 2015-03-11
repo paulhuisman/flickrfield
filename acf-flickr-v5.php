@@ -47,6 +47,7 @@ class acf_field_flickr extends acf_field {
 			'flickr_user_id'        => '',
 			'flickr_content_type'   => 'sets',
 			'flickr_sets_amount'    => '9999',
+			'flickr_max_selected'   => '0',
 			'flickr_thumb_size'     => 'square',
 			'flickr_large_size'     => 'large_1024',
 			'flickr_cache_enabled'  => '1',
@@ -117,6 +118,13 @@ class acf_field_flickr extends acf_field {
 				'100'  =>'100',
 				'9999' =>'Unlimited',
 			),
+		));
+
+		acf_render_field_setting( $field, array(
+			'label'        => __('Max selectable amount','acf-flickr'),
+			'instructions' => __('What\'s the maximum amount to be attached to a post? Using 0 is default (and unlimited).','acf-flickr'),
+			'type'         => 'text',
+			'name'         => 'flickr_max_selected',
 		));
 
 		$cache_dir = dirname(__FILE__) . '/cache';
@@ -210,10 +218,6 @@ class acf_field_flickr extends acf_field {
 			$duration = $field['flickr_cache_duration'] * 60 * 60;
 			$f->enableCache('fs', $cache_dir, $duration);		
 		}		
-
-		// Include fields.css from the ACF plugin for some more styling
-		wp_register_style('fields-css',get_bloginfo('wpurl'). '/wp-content/plugins/advanced-custom-fields/css/fields.css');
-		wp_enqueue_style('fields-css');
 		
 		$field['choices'] = array();
 		$field['choices'][''] = '';
@@ -246,7 +250,7 @@ class acf_field_flickr extends acf_field {
 							}
 							foreach($data as $key => $flickr) {
 								?>
-								<tr class="field_label flickr_row <?php if (in_array($flickr['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
+								<tr class="field_label flickr_row <?php if (isset($flickr['id']) && in_array($flickr['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
 									<td class="label set_image">
 										<?php if ($field['flickr_content_type'] == 'sets'): ?>
 											<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['farm'];?>.static.flickr.com/<?php echo $flickr['server'];?>/<?php echo $flickr['primary'];?>_<?php echo $flickr['secret'];?>_s.jpg">
@@ -335,7 +339,7 @@ class acf_field_flickr extends acf_field {
 		
 		// html
 		if (!isset($multiple)) { $multiple = ''; }
-		echo '<select id="' . $field['name'] . '" class="' . $field['class'] . '" name="' . $field['name'] . '" ' . $multiple . ' >';	
+		echo '<select id="' . $field['name'] . '" class="' . $field['class'] . '" name="' . $field['name'] . '" ' . $multiple . '  data-max-selectable="'. $field['flickr_max_selected'] .'" data-flickr-type="'. $field['flickr_content_type'] .'" >';	
 		
 		// null
 		if($field['required'] == '1')
