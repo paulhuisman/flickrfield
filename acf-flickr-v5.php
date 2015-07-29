@@ -1,7 +1,7 @@
 <?php
 
 class acf_field_flickr extends acf_field {
-	
+
 	/*
 	*  __construct
 	*
@@ -14,34 +14,34 @@ class acf_field_flickr extends acf_field {
 	*  @param	n/a
 	*  @return	n/a
 	*/
-	
+
 	function __construct() {
-		
+
 		/*
 		*  name (string) Single word, no spaces. Underscores allowed
 		*/
-		
+
 		$this->name = 'flickr';
-		
-		
+
+
 		/*
 		*  label (string) Multiple words, can include spaces, visible when selecting a field type
 		*/
-		
+
 		$this->label = __('Flickr Field', 'flickr');
-		
-		
+
+
 		/*
 		*  category (string) basic | content | choice | relational | jquery | layout | CUSTOM GROUP NAME
 		*/
-		
+
 		$this->category = 'content';
-		
-		
+
+
 		/*
 		*  defaults (array) Array of default settings which are merged into the field object. These are used later in settings
 		*/
-		
+
 		$this->defaults = array(
 			'flickr_api_key'        => '',
 			'flickr_user_id'        => '',
@@ -53,14 +53,14 @@ class acf_field_flickr extends acf_field {
 			'flickr_cache_enabled'  => '1',
 			'flickr_cache_duration' => '168',
 		);
-		
-				
+
+
 		// do not delete!
     parent::__construct();
-    	
+
 	}
-	
-	
+
+
 	/*
 	*  render_field_options()
 	*
@@ -74,7 +74,7 @@ class acf_field_flickr extends acf_field {
 	*  @param	$field (array) the $field being edited
 	*  @return	n/a
 	*/
-	
+
 	function render_field_settings( $field ) {
 		acf_render_field_setting( $field, array(
 			'required'  => true,
@@ -90,7 +90,7 @@ class acf_field_flickr extends acf_field {
 			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
 			'type'			=> 'text',
 			'name'			=> 'flickr_api_key',
-		));	
+		));
 
 		acf_render_field_setting( $field, array(
 			'label'			=> __('Type of content','acf-flickr'),
@@ -103,7 +103,7 @@ class acf_field_flickr extends acf_field {
 				'photostream' => 'Photostream',
 			),
 		));
-		
+
 		acf_render_field_setting( $field, array(
 			'label'        => __('Display amount','acf-flickr'),
 			'instructions' => __('How many sets/photos do you want to select from? The most recent items will be shown first.','acf-flickr'),
@@ -134,7 +134,7 @@ class acf_field_flickr extends acf_field {
 		else {
 			$instructions = '<span style="color:#336600">' . __('The cache folder is writable!', 'acf-flickr') . '</span>';
 		}
-				
+
 		acf_render_field_setting( $field, array(
 			'label'        => __('Enable cache','acf-flickr'),
 			'instructions' => $instructions,
@@ -152,7 +152,7 @@ class acf_field_flickr extends acf_field {
 			'type'         => 'text',
 			'name'         => 'flickr_cache_duration',
 			'append'       => 'minutes',
-		));	
+		));
 
 		acf_render_field_setting( $field, array(
 			'label'        => __('Thumbnail size','acf-flickr'),
@@ -162,12 +162,12 @@ class acf_field_flickr extends acf_field {
 			'choices' 		 => array(
 				'square'     => '75x75 (square)',
 				'thumbnail'  => '100px (rectangle)',
-				'square_150' => '150x150 (square)',				
+				'square_150' => '150x150 (square)',
 				'small_240'  => '240px (rectangle)',
 				'small_320'  => '320px (rectangle)',
 			),
 		));
-		
+
 		acf_render_field_setting( $field, array(
 			'label'        => __('Large size','acf-flickr'),
 			'instructions' => __('The preferred size of the enlargment of the photo.','acf-flickr'),
@@ -181,13 +181,13 @@ class acf_field_flickr extends acf_field {
 				'original'     => 'Original',
 			),
 		));
-		
-		
+
+
 
 	}
-	
-	
-	
+
+
+
 	/*
 	*  render_field()
 	*
@@ -202,37 +202,40 @@ class acf_field_flickr extends acf_field {
 	*  @param	$field (array) the $field being edited
 	*  @return	n/a
 	*/
-	
+
 	function render_field( $field ) {
 		// Defaults
 		$field['value'] = isset($field['value']) ? $field['value'] : array();
 		$field['optgroup'] = isset($field['optgroup']) ? $field['optgroup'] : false;
-		
+
 		// Get all Flickr sets by the given user ID and api key (both required)
 		require_once(dirname(__FILE__) . '/phpFlickr.php');
 		$f = new phpFlickr($field['flickr_api_key']);
-		
+
 		// Caching
 		$cache_dir = dirname(__FILE__) . '/cache';
 		if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
 			$duration = $field['flickr_cache_duration'] * 60 * 60;
-			$f->enableCache('fs', $cache_dir, $duration);		
-		}		
-		
+			$f->enableCache('fs', $cache_dir, $duration);
+		}
+
 		$field['choices'] = array();
 		$field['choices'][''] = '';
 		?>
-		
+
 		<div class="field_form flickr_field type_<?php echo $field['flickr_content_type']; ?>">
 			<?php
 			$items = array();
-			$items = json_decode($field['value']['items']);
+
+			if (isset($field['value']['items'])) {
+				$items = json_decode($field['value']['items']);
+			}
 
 			// Check for three types of Flickr content; Sets, Galleries and Photostream
 			if ($field['flickr_content_type'] == 'sets' || $field['flickr_content_type'] == 'galleries') {
 				if ($field['flickr_content_type'] == 'sets') {
 					$flickr_data = $f->photosets_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
-				} 
+				}
 				elseif ($field['flickr_content_type'] == 'galleries') {
 					$flickr_data = $f->galleries_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
 				}
@@ -240,11 +243,11 @@ class acf_field_flickr extends acf_field {
 
 				<table class="acf_input widefat acf_field_form_table">
 					<tbody>
-						<?php					
+						<?php
 						if (is_array($flickr_data) && !empty($flickr_data)) {
 							if ($field['flickr_content_type'] == 'sets') {
 								$data = $flickr_data['photoset'];
-							} 
+							}
 							elseif ($field['flickr_content_type'] == 'galleries') {
 								$data = $flickr_data['galleries']['gallery'];
 							}
@@ -263,7 +266,7 @@ class acf_field_flickr extends acf_field {
 										<p class="description"><?php echo $flickr['description'];?></p>
 										<p class="meta_data">
 											<?php _e('Added on');?> <?php echo date_i18n(get_option('date_format') ,$flickr['date_create']); echo ' &nbsp;|&nbsp; ';
-											echo $flickr['count_views'];?> <?php _e('views on Flickr'); 
+											echo $flickr['count_views'];?> <?php _e('views on Flickr');
 											echo ' &nbsp;|&nbsp; ';
 											echo $flickr['photos'];?> <?php _e('Photos');
 											if ($flickr['videos'] != 0) {
@@ -275,12 +278,12 @@ class acf_field_flickr extends acf_field {
 								 </tr>
 								<?php
 							}
-						}	
+						}
 						else {
 							?><tr class="field_label">
 								<td colspan="2"><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></td>
 							</tr><?php
-						}		
+						}
 					?>
 				</tbody>
 			</table>
@@ -291,7 +294,7 @@ class acf_field_flickr extends acf_field {
 				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
 					<ul class="field_label photostream">
 						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
-							<?php 
+							<?php
 							$active = '';
 							if (is_array($items)) {
 								foreach ($items as $k => $item) {
@@ -302,8 +305,8 @@ class acf_field_flickr extends acf_field {
 								}
 							}
 							?>
-							<li class="label flickr_row photo_image<?php echo $active; ?>" 
-								data-flickr-id="<?php echo $photo['id']; ?>" 
+							<li class="label flickr_row photo_image<?php echo $active; ?>"
+								data-flickr-id="<?php echo $photo['id']; ?>"
 								data-flickr-server="<?php echo $photo['server']; ?>"
 								data-flickr-secret="<?php echo $photo['secret']; ?>"
 								data-flickr-farm="<?php echo $photo['farm']; ?>"
@@ -316,37 +319,37 @@ class acf_field_flickr extends acf_field {
 					</ul>
 				<?php else: ?>
 					<p><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></p>
-				<?php 
+				<?php
 				endif;
-			}	
+			}
 			?>
 		</div>
-		
-		<?php 
+
+		<?php
 		if (!empty($sets['photoset'])) {
 			foreach($sets['photoset'] as $set_key => $set) {
 				// Add to the choices array for the selectbox
 				$field['choices'][$set['id']] = $set['title'] .' (' .$set['photos']. ' photos)';
 			}
 		}
-			
+
 		// no choices
 		if(empty($field['choices']))
 		{
 			echo '<p>' . __("No choices to choose from",'acf-flickr') . '</p>';
 			return false;
 		}
-		
+
 		// html
 		if (!isset($multiple)) { $multiple = ''; }
-		echo '<select id="' . $field['name'] . '" class="' . $field['class'] . '" name="' . $field['name'] . '" ' . $multiple . '  data-max-selectable="'. $field['flickr_max_selected'] .'" data-flickr-type="'. $field['flickr_content_type'] .'" >';	
-		
+		echo '<select id="' . $field['name'] . '" class="' . $field['class'] . '" name="' . $field['name'] . '" ' . $multiple . '  data-max-selectable="'. $field['flickr_max_selected'] .'" data-flickr-type="'. $field['flickr_content_type'] .'" >';
+
 		// null
 		if($field['required'] == '1')
 		{
 			echo '<option value="null"> - Select - </option>';
 		}
-		
+
 		// loop through values and add them as options
 		foreach($field['choices'] as $key => $value)
 		{
@@ -354,7 +357,7 @@ class acf_field_flickr extends acf_field {
 			{
 				// this select is grouped with optgroup
 				if($key != '') echo '<optgroup label="'.$key.'">';
-				
+
 				if($value)
 				{
 					foreach($value as $id => $label)
@@ -372,11 +375,11 @@ class acf_field_flickr extends acf_field {
 							{
 								$selected = 'selected="selected"';
 							}
-						}	
+						}
 						echo '<option value="'.$id.'" '.$selected.'>'.$label.'</option>';
 					}
 				}
-				
+
 				if($key != '') echo '</optgroup>';
 			}
 			else
@@ -394,16 +397,16 @@ class acf_field_flickr extends acf_field {
 					{
 						$selected = 'selected="selected"';
 					}
-				}	
+				}
 				echo '<option value="'.$key.'" '.$selected.'>'.$value.'</option>';
 			}
-			
+
 		}
 
 		echo '</select>';
-		
+
 	}
-		
+
 	/*
 	*  input_admin_enqueue_scripts()
 	*
@@ -419,20 +422,20 @@ class acf_field_flickr extends acf_field {
 	*/
 
 	function input_admin_enqueue_scripts() {
-		
+
 		$dir = plugin_dir_url( __FILE__ );
-		
+
 		// register & include JS
 		wp_register_script( 'acf-flickr-init', "{$dir}js/flickr-acf5.js" );
 		wp_enqueue_script('acf-flickr-init');
-		
+
 		// register & include CSS
-		wp_register_style( 'acf-input-flickr', "{$dir}css/input.css" ); 
+		wp_register_style( 'acf-input-flickr', "{$dir}css/input.css" );
 		wp_enqueue_style('acf-input-flickr');
-		
+
 	}
-	
-	
+
+
 	/*
 	*  input_admin_footer()
 	*
@@ -448,16 +451,16 @@ class acf_field_flickr extends acf_field {
 	*/
 
 	/*
-		
+
 	function input_admin_footer() {
-	
-		
-		
+
+
+
 	}
-	
+
 	*/
-	
-	
+
+
 	/*
 	*  field_group_admin_enqueue_scripts()
 	*
@@ -473,14 +476,14 @@ class acf_field_flickr extends acf_field {
 	*/
 
 	/*
-	
+
 	function field_group_admin_enqueue_scripts() {
-		
+
 	}
-	
+
 	*/
 
-	
+
 	/*
 	*  field_group_admin_head()
 	*
@@ -496,11 +499,11 @@ class acf_field_flickr extends acf_field {
 	*/
 
 	/*
-	
+
 	function field_group_admin_head() {
-	
+
 	}
-	
+
 	*/
 
 
@@ -530,11 +533,11 @@ class acf_field_flickr extends acf_field {
 		$data['api_key']    = $field['flickr_api_key'];
 
 		return $data;
-		
+
 	}
-	
-	
-	
+
+
+
 	/*
 	*  update_value()
 	*
@@ -549,18 +552,18 @@ class acf_field_flickr extends acf_field {
 	*  @param	$field (array) the field array holding all the field options
 	*  @return	$value
 	*/
-	
+
 	/*
-	
+
 	function update_value( $value, $post_id, $field ) {
-		
+
 		return $value;
-		
+
 	}
-	
+
 	*/
-	
-	
+
+
 	/*
 	*  format_value()
 	*
@@ -576,27 +579,27 @@ class acf_field_flickr extends acf_field {
 	*  @param	$template (boolean) true if value requires formatting for front end template function
 	*  @return	$value
 	*/
-		
-	
+
+
 	function format_value( $value, $post_id, $field ) {
 		// bail early if no value
 		if( empty($value)) {
 			return $value;
 		}
 		if (!empty($value['items'])) {
-			// Decode JSON format that is used in the database 
+			// Decode JSON format that is used in the database
 			$value['items'] = json_decode($value['items']);
 
 			// Initialize a new phpFlickr object based on your api key
 			require_once(dirname(__FILE__) . '/phpFlickr.php');
 			$f = new phpFlickr($value['api_key']);
-			
+
 			// enable phpFlickr caching if possible
 			$cache_dir = dirname(__FILE__) . '/cache';
 			if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
 				$duration = $field['flickr_cache_duration'] * 60;
-				$f->enableCache('fs', $cache_dir, $duration);		
-			}	
+				$f->enableCache('fs', $cache_dir, $duration);
+			}
 
 			if ($value['type'] == 'sets' || $value['type'] == 'galleries') {
 				// Get photos from Flickr based on set/gallery id
@@ -605,7 +608,7 @@ class acf_field_flickr extends acf_field {
 					if ($value['type'] == 'sets') {
 						$photos = $f->photosets_getPhotos($id, 'url_o');
 						$name = 'photoset';
-					} 
+					}
 					elseif ($value['type'] == 'galleries') {
 						$photos = $f->galleries_getPhotos($id, 'url_o');
 						$name = 'photos';
@@ -616,14 +619,14 @@ class acf_field_flickr extends acf_field {
 						$sets[$id][$photo['id']]['thumb']    = $f->buildPhotoURL($photo, $value['thumb_size']);
 						$sets[$id][$photo['id']]['large']    = ($value['large_size'] == 'original') ? $photo['url_o'] : $f->buildPhotoURL($photo, $value['large_size']);
 						$sets[$id][$photo['id']]['photo_id'] = $photo['id'];
-					}	
+					}
 				}
 				$value['items'] = $sets;
 			}
 			elseif($value['type'] == 'photostream') {
 				$items = array();
-				
-				foreach($value['items'] as $photo) {		
+
+				foreach($value['items'] as $photo) {
 					$items[] = array(
 						'title'    => $photo->title,
 						'thumb'    => $f->buildPhotoURL($photo, $value['thumb_size']),
@@ -634,10 +637,10 @@ class acf_field_flickr extends acf_field {
 				$value['items'] = $items;
 			}
 		}
-		
+
 		return $value;
 	}
-	
+
 }
 
 // create field
