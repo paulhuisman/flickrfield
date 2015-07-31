@@ -48,6 +48,7 @@ class acf_field_flickr extends acf_field {
 			'flickr_content_type'   => 'sets',
 			'flickr_sets_amount'    => '9999',
 			'flickr_max_selected'   => '0',
+			'flickr_show_limit'     => '500',
 			'flickr_thumb_size'     => 'square',
 			'flickr_large_size'     => 'large_1024',
 			'flickr_cache_enabled'  => '1',
@@ -106,7 +107,7 @@ class acf_field_flickr extends acf_field {
 
 		acf_render_field_setting( $field, array(
 			'label'        => __('Display amount','acf-flickr'),
-			'instructions' => __('How many sets/photos do you want to select from? The most recent items will be shown first.','acf-flickr'),
+			'instructions' => __('How many sets/photos do you want the admin to select from? The most recent items will be shown first.','acf-flickr'),
 			'type'         => 'select',
 			'name'         => 'flickr_sets_amount',
 			'choices'      => array(
@@ -122,7 +123,7 @@ class acf_field_flickr extends acf_field {
 
 		acf_render_field_setting( $field, array(
 			'label'        => __('Max selectable amount','acf-flickr'),
-			'instructions' => __('What\'s the maximum amount to be attached to a post? Using 0 is default (and unlimited).','acf-flickr'),
+			'instructions' => __('What\'s the maximum amount to be attached to a post by the user? Using 0 is default (and unlimited).','acf-flickr'),
 			'type'         => 'text',
 			'name'         => 'flickr_max_selected',
 		));
@@ -155,6 +156,13 @@ class acf_field_flickr extends acf_field {
 		));
 
 		acf_render_field_setting( $field, array(
+			'label'        => __('Maximum amount of photos in the set to load', 'acf-flickr'),
+			'instructions' => __('For sets only: How many photos should be loaded when viewing the set? Flickr allows a maximum of 500.', 'acf-flickr'),
+			'type'         => 'text',
+			'name'         => 'flickr_show_limit',
+		));
+
+		acf_render_field_setting( $field, array(
 			'label'        => __('Thumbnail size','acf-flickr'),
 			'instructions' => __('The preferred size of the photo thumbnail.','acf-flickr'),
 			'type'         => 'select',
@@ -182,10 +190,7 @@ class acf_field_flickr extends acf_field {
 			),
 		));
 
-
-
 	}
-
 
 
 	/*
@@ -525,12 +530,13 @@ class acf_field_flickr extends acf_field {
 	function load_value( $value, $post_id, $field ) {
 		$data = array();
 
-		$data['items']      = $value;
-		$data['type']       = $field['flickr_content_type'];
-		$data['thumb_size'] = $field['flickr_thumb_size'];
-		$data['large_size'] = $field['flickr_large_size'];
-		$data['user_id']    = $field['flickr_user_id'];
-		$data['api_key']    = $field['flickr_api_key'];
+		$data['items']             = $value;
+		$data['type']              = $field['flickr_content_type'];
+		$data['flickr_show_limit'] = $field['flickr_show_limit'];
+		$data['thumb_size']        = $field['flickr_thumb_size'];
+		$data['large_size']        = $field['flickr_large_size'];
+		$data['user_id']           = $field['flickr_user_id'];
+		$data['api_key']           = $field['flickr_api_key'];
 
 		return $data;
 
@@ -583,7 +589,7 @@ class acf_field_flickr extends acf_field {
 
 	function format_value( $value, $post_id, $field ) {
 		// bail early if no value
-		if( empty($value)) {
+		if(empty($value)) {
 			return $value;
 		}
 		if (!empty($value['items'])) {
@@ -602,15 +608,20 @@ class acf_field_flickr extends acf_field {
 			}
 
 			if ($value['type'] == 'sets' || $value['type'] == 'galleries') {
+				// Set default to get if flickr_show_limit does not exist
+				if(!isset($value['flickr_show_limit'])) {
+					$value['flickr_show_limit'] = '500';
+				}
+
 				// Get photos from Flickr based on set/gallery id
 				$sets = array();
 				foreach($value['items'] as $id) {
 					if ($value['type'] == 'sets') {
-						$photos = $f->photosets_getPhotos($id, 'url_o');
+						$photos = $f->photosets_getPhotos($id, 'url_o', null, $value['flickr_show_limit']);
 						$name = 'photoset';
 					}
 					elseif ($value['type'] == 'galleries') {
-						$photos = $f->galleries_getPhotos($id, 'url_o');
+						$photos = $f->galleries_getPhotos($id, 'url_o', $value['flickr_show_limit']);
 						$name = 'photos';
 					}
 					// Loop through all photos and create a thumb and large url
