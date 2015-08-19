@@ -3,7 +3,7 @@ Flickr field for Advanced Custom Fields v4 and v5
 
 ## Description
 
-The Flickr Field will grant you the ability to include photos, sets and galleries from your Flickr account. After selecting which image formats you wish to use the plugin will generate the flickr image urls. This plugin is an add-on for the Advanced Custom Fields WordPress plugin.
+The Flickr Field will grant you the ability to include photos, sets and galleries from your Flickr account. After selecting which image formats you wish to use the plugin will generate the flickr image urls. This plugin is an add-on for the Advanced Custom Fields WordPress plugin. For more info, check the [plugin page on WordPress.org](https://wordpress.org/plugins/flickr-field-for-advanced-custom-fields/).
 
 ## Notice
 
@@ -13,7 +13,7 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 
 ## Installation
 
-1. Download the ACF Flickr Field repo to your plugin directory by downloading https://github.com/paulhuisman/flickrfield/zipball/master or clone it via git: git clone git://github.com/paulhuisman/flickrfield.git  
+1. Download the ACF Flickr Field repo to your plugin directory by downloading https://github.com/paulhuisman/flickrfield/zipball/master or clone it via git: git clone git://github.com/paulhuisman/flickrfield.git
 2. Enable the plugin in your Wordpress installation.
 3. Succes! You can now select a Flickr field when you create new custom fields.
 
@@ -40,3 +40,4 @@ The Flickr Field will grant you the ability to include photos, sets and gallerie
 			}
 		}
 	}
+
