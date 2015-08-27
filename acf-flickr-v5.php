@@ -135,6 +135,7 @@ class acf_field_flickr extends acf_field {
 		else {
 			$instructions = '<span style="color:#336600">' . __('The cache folder is writable!', 'acf-flickr') . '</span>';
 		}
+  	$instructions .= ' ' . __('Alternatively, you can control your own caching folder by setting the constant <strong>FLICKR_FIELD_CACHE_DIR</strong>.', 'acf-flickr');
 
 		acf_render_field_setting( $field, array(
 			'label'        => __('Enable cache','acf-flickr'),
@@ -219,6 +220,9 @@ class acf_field_flickr extends acf_field {
 
 		// Caching
 		$cache_dir = dirname(__FILE__) . '/cache';
+		if(defined('FLICKR_FIELD_CACHE_DIR')) {
+			$cache_dir = FLICKR_FIELD_CACHE_DIR;
+		}
 		if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
 			$duration = $field['flickr_cache_duration'] * 60 * 60;
 			$f->enableCache('fs', $cache_dir, $duration);
@@ -602,6 +606,9 @@ class acf_field_flickr extends acf_field {
 
 			// enable phpFlickr caching if possible
 			$cache_dir = dirname(__FILE__) . '/cache';
+			if(defined('FLICKR_FIELD_CACHE_DIR')) {
+				$cache_dir = FLICKR_FIELD_CACHE_DIR;
+			}
 			if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
 				$duration = $field['flickr_cache_duration'] * 60;
 				$f->enableCache('fs', $cache_dir, $duration);
