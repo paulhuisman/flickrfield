@@ -1,0 +1,12 @@
+[data-name="flickr_private_token"] {
+  display: none;
+}
+[data-name="flickr_secret_key"] {
+  display: none;
+}
+[data-name="flickr_cache_duration"] {
+  display: none;
+}
+.acf-field .description a {
+  text-decoration: underline;
+}

@@ -45,6 +45,9 @@ class acf_field_flickr extends acf_field {
 		$this->defaults = array(
 			'flickr_api_key'        => '',
 			'flickr_user_id'        => '',
+			'flickr_private_mode'   => 0,
+			'flickr_secret_key'     => '',
+			'flickr_private_token'  => '',
 			'flickr_content_type'   => 'sets',
 			'flickr_sets_amount'    => '9999',
 			'flickr_max_selected'   => '0',
@@ -80,7 +83,7 @@ class acf_field_flickr extends acf_field {
 		acf_render_field_setting( $field, array(
 			'required'  => true,
 			'label'			=> __('Flickr User ID','acf-flickr'),
-			'instructions'	=> __('Find your User ID at','acf-flickr') . ' <a href="http://idgettr.com/">http://idgettr.com/</a>',
+			'instructions'	=> __('Find your User ID at','acf-flickr') . ' <a href="http://idgettr.com/" target="_blank">http://idgettr.com/</a>. Alternatively, you can set the constant <strong>FLICKR_FIELD_USER_ID</strong>.',
 			'type'			=> 'text',
 			'name'			=> 'flickr_user_id',
 		));
@@ -88,10 +91,41 @@ class acf_field_flickr extends acf_field {
 		acf_render_field_setting( $field, array(
 			'required'  => true,
 			'label'			=> __('Flickr API Key','acf-flickr'),
-			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
+			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>',
 			'type'			=> 'text',
 			'name'			=> 'flickr_api_key',
 		));
+
+		acf_render_field_setting( $field, array(
+			'label'        => __('Flickr Private Mode','acf-flickr'),
+			'instructions'	=> __('When private mode is enabled you <strong>need to supply a token</strong> in order to get private photos.','acf-flickr'),
+			'type'         => 'radio',
+			'layout'       => 'horizontal',
+			'name'         => 'flickr_private_mode',
+			'class'				 => 'flickr_private_mode_select',
+			'choices'      => array(
+				'0' => 'Off',
+				'1' => 'On',
+			),
+		));
+
+		acf_render_field_setting( $field, array(
+			'label'        => __('Flickr Secret Key','acf-flickr'),
+			'instructions' => __('Find or register your Secret key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>',
+			'type'         => 'text',
+			'name'         => 'flickr_secret_key',
+			'class'        => 'flickr_secret_key',
+		));
+
+
+		acf_render_field_setting( $field, array(
+			'label'        => __('Flickr Private Token','acf-flickr'),
+			'instructions' => __('If you haven\'t got a token yet you can try this modified phpFlickr script <a href="' . plugin_dir_url( __FILE__ ) . 'phpflickr/generate_flickr_token.php" target="_blank">to generate private flickr token</a>. Alternatively, you can set the constant <strong>FLICKR_FIELD_API_TOKEN</strong>.', 'acf-flickr'),
+			'type'         => 'text',
+			'name'         => 'flickr_private_token',
+			'class'        => 'flickr_private_token',
+		));
+
 
 		acf_render_field_setting( $field, array(
 			'label'			=> __('Type of content','acf-flickr'),
@@ -111,13 +145,13 @@ class acf_field_flickr extends acf_field {
 			'type'         => 'select',
 			'name'         => 'flickr_sets_amount',
 			'choices'      => array(
-				'10'   =>'10',
-				'20'   =>'20',
-				'30'   =>'30',
-				'40'   =>'40',
-				'50'   =>'50',
-				'100'  =>'100',
-				'9999' =>'Unlimited',
+				'10'   => '10',
+				'20'   => '20',
+				'30'   => '30',
+				'40'   => '40',
+				'50'   => '50',
+				'100'  => '100',
+				'9999' => 'Unlimited',
 			),
 		));
 
@@ -140,19 +174,22 @@ class acf_field_flickr extends acf_field {
 		acf_render_field_setting( $field, array(
 			'label'        => __('Enable cache','acf-flickr'),
 			'instructions' => $instructions,
-			'type'         => 'select',
+			'type'         => 'radio',
+			'layout'       => 'horizontal',
 			'name'         => 'flickr_cache_enabled',
+			'class'				 => 'flickr_cache_select',
 			'choices'      => array(
-				'1' => 'Yes',
-				'0' => 'No',
+				'0' => 'Off',
+				'1' => 'On',
 			),
 		));
 
 		acf_render_field_setting( $field, array(
 			'label'        => __('Cache duration','acf-flickr'),
-			'instructions' => __('The time your cache may last in minutes (this setting will be ignored when your cache is disabled).','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/">http://www.flickr.com/services/apps</a>',
+			'instructions' => __('The time your cache may last in minutes.','acf-flickr'),
 			'type'         => 'text',
 			'name'         => 'flickr_cache_duration',
+			'class'        => 'flickr_cache_duration',
 			'append'       => 'minutes',
 		));
 
@@ -215,8 +252,17 @@ class acf_field_flickr extends acf_field {
 		$field['optgroup'] = isset($field['optgroup']) ? $field['optgroup'] : false;
 
 		// Get all Flickr sets by the given user ID and api key (both required)
-		require_once(dirname(__FILE__) . '/phpFlickr.php');
-		$f = new phpFlickr($field['flickr_api_key']);
+		require_once(dirname(__FILE__) . '/phpflickr/phpFlickr.php');
+
+		if($field['flickr_private_mode']) {
+			// Private Mode
+			$f = new phpFlickr($field['flickr_api_key'], $field['flickr_secret_key'], true);
+		  $f->setToken($field['flickr_private_token']);
+		}
+		else {
+			// Public Mode
+			$f = new phpFlickr($field['flickr_api_key']);
+		}
 
 		// Caching
 		$cache_dir = dirname(__FILE__) . '/cache';
@@ -228,8 +274,12 @@ class acf_field_flickr extends acf_field {
 			$f->enableCache('fs', $cache_dir, $duration);
 		}
 
-		$field['choices'] = array();
-		$field['choices'][''] = '';
+		// Check if user id exists in constants, if so - use that one
+		if(defined('FLICKR_FIELD_USER_ID')) {
+			$field['flickr_user_id'] = FLICKR_FIELD_USER_ID;
+		}
+
+		$field['choices'] = array(array());
 		?>
 
 		<div class="field_form flickr_field type_<?php echo $field['flickr_content_type']; ?>">
@@ -299,7 +349,12 @@ class acf_field_flickr extends acf_field {
 			<?php
 			}
 			elseif($field['flickr_content_type'] == 'photostream') {
-				$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, 'url_o', $field['flickr_sets_amount'], '');
+				if($field['flickr_private_mode']) {
+					$flickr_data = $f->people_getPhotos($field['flickr_user_id'], array('privacy_filter' => 5, 'per_page' => $field['flickr_sets_amount']) );
+				}
+				else {
+					$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, 'url_o', $field['flickr_sets_amount'], '');
+				}
 				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
 					<ul class="field_label photostream">
 						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
@@ -484,13 +539,16 @@ class acf_field_flickr extends acf_field {
 	*  @return	n/a
 	*/
 
-	/*
-
 	function field_group_admin_enqueue_scripts() {
+		$dir = plugin_dir_url( __FILE__ );
 
+		wp_register_script('acf-input-flickr-field-options', $dir . 'js/options.js');
+    wp_enqueue_script( 'acf-input-flickr-field-options');
+
+    wp_register_style('acf-input-flickr-field-options', $dir . 'css/options.css');
+    wp_enqueue_style( 'acf-input-flickr-field-options');
 	}
 
-	*/
 
 
 	/*
@@ -541,9 +599,11 @@ class acf_field_flickr extends acf_field {
 		$data['large_size']        = $field['flickr_large_size'];
 		$data['user_id']           = $field['flickr_user_id'];
 		$data['api_key']           = $field['flickr_api_key'];
+		$data['private_mode']      = $field['flickr_private_mode'];
+		$data['secret_key']        = $field['flickr_secret_key'];
+		$data['private_token']     = $field['flickr_private_token'];
 
 		return $data;
-
 	}
 
 
@@ -601,8 +661,17 @@ class acf_field_flickr extends acf_field {
 			$value['items'] = json_decode($value['items']);
 
 			// Initialize a new phpFlickr object based on your api key
-			require_once(dirname(__FILE__) . '/phpFlickr.php');
-			$f = new phpFlickr($value['api_key']);
+			require_once(dirname(__FILE__) . '/phpflickr/phpFlickr.php');
+
+			if($value['private_mode']) {
+				// Private Mode
+				$f = new phpFlickr($value['api_key'], $value['secret_key'], true);
+			  $f->setToken($value['private_token']);
+			}
+			else {
+				// Public Mode
+				$f = new phpFlickr($value['api_key']);
+			}
 
 			// enable phpFlickr caching if possible
 			$cache_dir = dirname(__FILE__) . '/cache';
@@ -624,7 +693,10 @@ class acf_field_flickr extends acf_field {
 				$sets = array();
 				foreach($value['items'] as $id) {
 					if ($value['type'] == 'sets') {
-						$photos = $f->photosets_getPhotos($id, 'url_o', null, $value['flickr_show_limit']);
+						$privacy_filter = $value['private_mode'] == true ? 5 : 1;
+
+						$photos = $f->photosets_getPhotos($id, 'url_o', $privacy_filter, $value['flickr_show_limit']);
+
 						$name = 'photoset';
 					}
 					elseif ($value['type'] == 'galleries') {
