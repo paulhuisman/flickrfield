@@ -5,6 +5,8 @@ Flickr field for Advanced Custom Fields v4 and v5
 
 The Flickr Field will grant you the ability to include photos, sets and galleries from your Flickr account. After selecting which image formats you wish to use the plugin will generate the flickr image urls. This plugin is an add-on for the Advanced Custom Fields WordPress plugin.
 
+This plugins also grants you the ability to enable "Private Mode". Here you have to authenticate your account and generate a token which you can use to access your own private pictures. These private pictures are not available for the public on your Flickr.com account.
+
 For more info, check the [plugin page on WordPress.org](https://wordpress.org/plugins/flickr-field-for-advanced-custom-fields/).
 
 ## Notice
