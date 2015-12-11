@@ -21,7 +21,6 @@ in your application.
 
 *******************************************/
 
-//72157662134318941-83407456c7a2bb52-24737975
 require_once(dirname(__FILE__) . "/phpFlickr.php");
 
 if (isset($_POST['api_key']) && isset($_POST['secret'])) {
