@@ -254,7 +254,7 @@ class acf_field_flickr extends acf_field {
 		// Get all Flickr sets by the given user ID and api key (both required)
 		require_once(dirname(__FILE__) . '/phpflickr/phpFlickr.php');
 
-		if($field['flickr_private_mode']) {
+		if(isset($field['flickr_private_mode']) && $field['flickr_private_mode'] == true) {
 			// Private Mode
 			$f = new phpFlickr($field['flickr_api_key'], $field['flickr_secret_key'], true);
 		  $f->setToken($field['flickr_private_token']);
@@ -349,7 +349,7 @@ class acf_field_flickr extends acf_field {
 			<?php
 			}
 			elseif($field['flickr_content_type'] == 'photostream') {
-				if($field['flickr_private_mode']) {
+				if(isset($field['flickr_private_mode']) && $field['flickr_private_mode'] == true) {
 					$flickr_data = $f->people_getPhotos($field['flickr_user_id'], array('privacy_filter' => 5, 'per_page' => $field['flickr_sets_amount']) );
 				}
 				else {
@@ -599,9 +599,9 @@ class acf_field_flickr extends acf_field {
 		$data['large_size']        = $field['flickr_large_size'];
 		$data['user_id']           = $field['flickr_user_id'];
 		$data['api_key']           = $field['flickr_api_key'];
-		$data['private_mode']      = $field['flickr_private_mode'];
-		$data['secret_key']        = $field['flickr_secret_key'];
-		$data['private_token']     = $field['flickr_private_token'];
+		$data['private_mode']      = isset($field['flickr_private_mode']) ? $field['flickr_private_mode'] : 0;
+		$data['secret_key']        = isset($field['flickr_secret_key']) ? $field['flickr_secret_key'] : '';
+		$data['private_token']     = isset($field['flickr_private_token']) ? $field['flickr_private_token'] : '';
 
 		return $data;
 	}
