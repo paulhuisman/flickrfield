@@ -457,7 +457,7 @@ class acf_field_flickr extends acf_field {
 						}
 						else {
 							?><tr class="field_label">
-								<td colspan="2"><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></td>
+								<td colspan="2"><?php _e('There are no Flickr sets available for user ID'); ?> <em><?php echo $field['flickr_user_id']; ?></em> <?php _e('or there is a problem with api key'); ?> <em><?php echo $field['flickr_api_key']; ?></em></td>
 							</tr><?php
 						}
 					?>
