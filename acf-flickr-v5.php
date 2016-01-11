@@ -91,7 +91,7 @@ class acf_field_flickr extends acf_field {
 		acf_render_field_setting( $field, array(
 			'required'  => true,
 			'label'			=> __('Flickr API Key','acf-flickr'),
-			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>',
+			'instructions'	=> __('Find or register your API key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>. Alternatively, you can set the constant <strong>FLICKR_FIELD_API_KEY</strong>.',
 			'type'			=> 'text',
 			'name'			=> 'flickr_api_key',
 		));
@@ -111,7 +111,7 @@ class acf_field_flickr extends acf_field {
 
 		acf_render_field_setting( $field, array(
 			'label'        => __('Flickr Secret Key','acf-flickr'),
-			'instructions' => __('Find or register your Secret key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>',
+			'instructions' => __('Find or register your Secret key at','acf-flickr') . ' <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>. Alternatively, you can set the constant <strong>FLICKR_FIELD_SECRET</strong>.',
 			'type'         => 'text',
 			'name'         => 'flickr_secret_key',
 			'class'        => 'flickr_secret_key',

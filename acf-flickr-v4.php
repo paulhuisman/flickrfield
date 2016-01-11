@@ -114,7 +114,7 @@ class acf_field_flickr extends acf_field {
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
 				<label><?php _e('Flickr API Key','acf-flickr'); ?><span class="required">*</span></label>
-				<p class="description"><?php _e('Find or register your API key at <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>', 'acf-flickr');?></p>
+				<p class="description"><?php _e('Find or register your API key at <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>', 'acf-flickr');?>.  Alternatively, you can set the constant <strong>FLICKR_FIELD_API_KEY</strong>.</p>
 			</td>
 			<td>
 				<?php
@@ -150,7 +150,7 @@ class acf_field_flickr extends acf_field {
 		<tr class="field_option field_option_<?php echo $this->name; ?>" data-name="flickr_secret_key">
 			<td class="label">
 				<label><?php _e('Flickr Secret Key','acf-flickr'); ?><span class="required">*</span></label>
-				<p class="description"><?php _e('Find or register your secret key at <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>', 'acf-flickr');?></p>
+				<p class="description"><?php _e('Find or register your secret key at <a href="http://www.flickr.com/services/apps/" target="_blank">http://www.flickr.com/services/apps</a>', 'acf-flickr');?>.  Alternatively, you can set the constant <strong>FLICKR_FIELD_SECRET</strong>.</p>
 			</td>
 			<td>
 				<?php
