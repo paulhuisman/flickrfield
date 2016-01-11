@@ -254,6 +254,17 @@ class acf_field_flickr extends acf_field {
 		// Get all Flickr sets by the given user ID and api key (both required)
 		require_once(dirname(__FILE__) . '/phpflickr/phpFlickr.php');
 
+		// Check constants
+		if(defined('FLICKR_FIELD_API_KEY')) {
+			$field['flickr_api_key'] = FLICKR_FIELD_API_KEY;
+		}
+		if(defined('FLICKR_FIELD_SECRET')) {
+			$field['flickr_secret_key'] = FLICKR_FIELD_SECRET;
+		}
+		if(defined('FLICKR_FIELD_API_TOKEN')) {
+			$field['flickr_private_token'] = FLICKR_FIELD_API_TOKEN;
+		}
+
 		if(isset($field['flickr_private_mode']) && $field['flickr_private_mode'] == true) {
 			// Private Mode
 			$f = new phpFlickr($field['flickr_api_key'], $field['flickr_secret_key'], true);
@@ -340,7 +351,7 @@ class acf_field_flickr extends acf_field {
 						}
 						else {
 							?><tr class="field_label">
-								<td colspan="2"><?php _e('There are no Flickr sets available for user ID'); ?> <em><?php echo $field['flickr_user_id']; ?></em> <?php _e('or there is a problem with api key'); ?> <em><?php echo $field['flickr_api_key']; ?></em></td>
+								<td colspan="2"><?php _e('There is no Flickr data available for user ID'); ?> <em><?php echo $field['flickr_user_id']; ?></em> <?php _e('or there is a problem with api key'); ?> <em><?php echo $field['flickr_api_key']; ?></em></td>
 							</tr><?php
 						}
 					?>
@@ -382,7 +393,7 @@ class acf_field_flickr extends acf_field {
 						<?php endforeach; ?>
 					</ul>
 				<?php else: ?>
-					<p><?php _e('There are no Flickr sets available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with API KEY'); ?> <?php echo $field['api_key']; ?></p>
+					<p><?php _e('There is no Flickr data available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with api key'); ?> <?php echo $field['flickr_api_key']; ?></p>
 				<?php
 				endif;
 			}
@@ -662,6 +673,17 @@ class acf_field_flickr extends acf_field {
 
 			// Initialize a new phpFlickr object based on your api key
 			require_once(dirname(__FILE__) . '/phpflickr/phpFlickr.php');
+
+			// Check constants
+			if(defined('FLICKR_FIELD_API_KEY')) {
+				$value['api_key'] = FLICKR_FIELD_API_KEY;
+			}
+			if(defined('FLICKR_FIELD_SECRET')) {
+				$value['secret_key'] = FLICKR_FIELD_SECRET;
+			}
+			if(defined('FLICKR_FIELD_API_TOKEN')) {
+				$value['private_token'] = FLICKR_FIELD_API_TOKEN;
+			}
 
 			if($value['private_mode']) {
 				// Private Mode
