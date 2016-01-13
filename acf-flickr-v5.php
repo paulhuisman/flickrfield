@@ -314,7 +314,7 @@ class acf_field_flickr extends acf_field {
 				<table class="acf_input widefat acf_field_form_table">
 					<tbody>
 						<?php
-						if (is_array($flickr_data) && !empty($flickr_data)) {
+						if (is_array($flickr_data) && (!empty($flickr_data['photoset']) || !empty($flickr_data['galleries']['gallery']))) {
 							if ($field['flickr_content_type'] == 'sets') {
 								$data = $flickr_data['photoset'];
 							}
