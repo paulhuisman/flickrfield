@@ -43,19 +43,20 @@ class acf_field_flickr extends acf_field {
 		*/
 
 		$this->defaults = array(
-			'flickr_api_key'        => '',
-			'flickr_user_id'        => '',
-			'flickr_private_mode'   => 0,
-			'flickr_secret_key'     => '',
-			'flickr_private_token'  => '',
-			'flickr_content_type'   => 'sets',
-			'flickr_sets_amount'    => '9999',
-			'flickr_max_selected'   => '0',
-			'flickr_show_limit'     => '500',
-			'flickr_thumb_size'     => 'square',
-			'flickr_large_size'     => 'large_1024',
-			'flickr_cache_enabled'  => '1',
-			'flickr_cache_duration' => '168',
+			'flickr_api_key'              => '',
+			'flickr_user_id'              => '',
+			'flickr_private_mode'         => 0,
+			'flickr_secret_key'           => '',
+			'flickr_private_token'        => '',
+			'flickr_content_type'         => 'sets',
+			'flickr_sets_amount'          => '9999',
+			'flickr_max_selected'         => '0',
+			'flickr_show_limit'           => '500',
+			'flickr_thumb_size'           => 'square',
+			'flickr_large_size'           => 'large_1024',
+			'flickr_cache_enabled'        => '1',
+			'flickr_admin_cache_duration' => '30',
+			'flickr_cache_duration'       => '168',
 		);
 
 
@@ -185,11 +186,20 @@ class acf_field_flickr extends acf_field {
 		));
 
 		acf_render_field_setting( $field, array(
-			'label'        => __('Cache duration','acf-flickr'),
-			'instructions' => __('The time your cache may last in minutes.','acf-flickr'),
+			'label'        => __('Front-end cache duration','acf-flickr'),
+			'instructions' => __('The time your front-end cache may last in minutes (how visitors view the photos).','acf-flickr'),
 			'type'         => 'text',
 			'name'         => 'flickr_cache_duration',
 			'class'        => 'flickr_cache_duration',
+			'append'       => 'minutes',
+		));
+
+		acf_render_field_setting( $field, array(
+			'label'        => __('Admin cache duration','acf-flickr'),
+			'instructions' => __('The time your admin cache may last in minutes. This is usually lower than the front-end cache duration.','acf-flickr'),
+			'type'         => 'text',
+			'name'         => 'flickr_admin_cache_duration',
+			'class'        => 'flickr_admin_cache_duration',
 			'append'       => 'minutes',
 		));
 
@@ -281,7 +291,8 @@ class acf_field_flickr extends acf_field {
 			$cache_dir = FLICKR_FIELD_CACHE_DIR;
 		}
 		if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
-			$duration = $field['flickr_cache_duration'] * 60 * 60;
+			$admin_cache = isset($field['flickr_admin_cache_duration']) ? $field['flickr_admin_cache_duration'] : $field['flickr_cache_duration'];
+			$duration = $admin_cache * 60 * 60;
 			$f->enableCache('fs', $cache_dir, $duration);
 		}
 

@@ -14,6 +14,7 @@ jQuery(function($){
     $('input:radio', this).each(function() {
       if ($(this).is(':checked') && $(this).val() == '1') {
         $wrap.parent().parent().parent().find('[data-name="flickr_cache_duration"]').css('display', 'table-row');
+        $wrap.parent().parent().parent().find('[data-name="flickr_admin_cache_duration"]').css('display', 'table-row');
       }
     });
   });
@@ -27,6 +28,7 @@ jQuery(function($){
   $(document).on('change', '.flickr_cache_select', function(e) {
     // Toggle hidden cache field(s)
     $(this).parent().parent().parent().find('[data-name="flickr_cache_duration"]').toggle();
+    $(this).parent().parent().parent().find('[data-name="flickr_admin_cache_duration"]').toggle();
   });
 
 });

@@ -7,6 +7,9 @@
 [data-name="flickr_cache_duration"] {
   display: none;
 }
+[data-name="flickr_admin_cache_duration"] {
+  display: none;
+}
 .acf-field .description a {
   text-decoration: underline;
 }

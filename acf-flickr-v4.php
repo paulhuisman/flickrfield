@@ -24,19 +24,20 @@ class acf_field_flickr extends acf_field {
 		$this->category = __("Content", 'acf'); // Basic, Content, Choice, etc
 		$this->defaults = array(
 			// add defaults here to merge into your field.
-			'flickr_api_key'        => '',
-			'flickr_user_id'        => '',
-			'flickr_content_type'   => 'sets',
-    	'flickr_private_mode'   => 0,
-      'flickr_secret_key'     => '',
-      'flickr_private_token'  => '',
-			'flickr_sets_amount'    => '9999',
-			'flickr_max_selected'   => '0',
-			'flickr_thumb_size'     => 'square',
-			'flickr_large_size'     => 'large_1024',
-			'flickr_show_limit'     => '500',
-			'flickr_cache_enabled'  => '1',
-			'flickr_cache_duration' => '168',
+			'flickr_api_key'              => '',
+			'flickr_user_id'              => '',
+			'flickr_content_type'         => 'sets',
+			'flickr_private_mode'         => 0,
+			'flickr_secret_key'           => '',
+			'flickr_private_token'        => '',
+			'flickr_sets_amount'          => '9999',
+			'flickr_max_selected'         => '0',
+			'flickr_thumb_size'           => 'square',
+			'flickr_large_size'           => 'large_1024',
+			'flickr_show_limit'           => '500',
+			'flickr_cache_enabled'        => '1',
+			'flickr_admin_cache_duration' => '30',
+			'flickr_cache_duration'       => '168',
 		);
 
 
@@ -272,8 +273,8 @@ class acf_field_flickr extends acf_field {
 		</tr>
 		<tr class="field_option field_option_<?php echo $this->name; ?>" data-name="flickr_cache_duration">
 			<td class="label">
-				<label><?php _e('Cache duration','acf-flickr'); ?></label>
-				<p class="description"><?php _e('The time your cache may last in minutes.', 'acf-flickr');?></p>
+				<label><?php _e('Front-end cache duration','acf-flickr'); ?></label>
+				<p class="description"><?php _e('The time your front-end cache may last in minutes (how visitors view the photos).', 'acf-flickr');?></p>
 			</td>
 			<td>
 				<?php
@@ -281,6 +282,21 @@ class acf_field_flickr extends acf_field {
 					'type'		=>	'text',
 					'name'		=>	'fields['.$key.'][flickr_cache_duration]',
 					'value'		=>	$field['flickr_cache_duration'],
+				));
+				?>
+			</td>
+		</tr>
+		<tr class="field_option field_option_<?php echo $this->name; ?>" data-name="flickr_cache_duration">
+			<td class="label">
+				<label><?php _e('Admin cache duration','acf-flickr'); ?></label>
+				<p class="description"><?php _e('The time your admin cache may last in minutes. This is usually lower than the front-end cache duration.', 'acf-flickr');?></p>
+			</td>
+			<td>
+				<?php
+				do_action('acf/create_field', array(
+					'type'		=>	'text',
+					'name'		=>	'fields['.$key.'][flickr_admin_cache_duration]',
+					'value'		=>	$field['flickr_admin_cache_duration'],
 				));
 				?>
 			</td>
@@ -398,7 +414,8 @@ class acf_field_flickr extends acf_field {
 			$cache_dir = FLICKR_FIELD_CACHE_DIR;
 		}
 		if (is_writeable($cache_dir) && $field['flickr_cache_enabled'] == 1) {
-			$duration = $field['flickr_cache_duration'] * 60 * 60;
+			$admin_cache = isset($field['flickr_admin_cache_duration']) ? $field['flickr_admin_cache_duration'] : $field['flickr_cache_duration'];
+			$duration = $admin_cache * 60 * 60;
 			$f->enableCache('fs', $cache_dir, $duration);
 		}
 
