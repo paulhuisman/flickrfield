@@ -315,43 +315,42 @@ class acf_field_flickr extends acf_field {
 			// Check for three types of Flickr content; Sets, Galleries and Photostream
 			if ($field['flickr_content_type'] == 'sets' || $field['flickr_content_type'] == 'galleries') {
 				if ($field['flickr_content_type'] == 'sets') {
-					$flickr_data = $f->photosets_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
+					$response = file_get_contents("https://api.flickr.com/services/rest/?method=flickr.photosets.getList&api_key={$field['flickr_api_key']}&user_id={$field['flickr_user_id']}&primary_photo_extras=url_o%2Curl_sq&per_page={$field['flickr_sets_amount']}&format=json&nojsoncallback=1");
 				}
 				elseif ($field['flickr_content_type'] == 'galleries') {
-					$flickr_data = $f->galleries_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
+					$response = file_get_contents("https://api.flickr.com/services/rest/?method=flickr.galleries.getList&api_key={$field['flickr_api_key']}&user_id={$field['flickr_user_id']}&extras=url_sq%2Curl_o&per_page={$field['flickr_sets_amount']}&format=json&nojsoncallback=1");
 				}
+				if($response) {
+          $flickr_data = json_decode($response);
+        }
 				?>
 
 				<table class="acf_input widefat acf_field_form_table">
 					<tbody>
 						<?php
-						if (is_array($flickr_data) && (!empty($flickr_data['photoset']) || !empty($flickr_data['galleries']['gallery']))) {
+						if (is_object($flickr_data) && (!empty($flickr_data->photosets) || !empty($flickr_data->galleries->gallery))) {
 							if ($field['flickr_content_type'] == 'sets') {
-								$data = $flickr_data['photoset'];
+								$data = $flickr_data->photosets->photoset;
 							}
 							elseif ($field['flickr_content_type'] == 'galleries') {
 								$data = $flickr_data['galleries']['gallery'];
 							}
-							foreach($data as $key => $flickr) {
+							foreach($data as $k => $flickr_set) {
 								?>
-								<tr class="field_label flickr_row <?php if (isset($flickr['id']) && in_array($flickr['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
+								<tr class="field_label flickr_row <?php if (isset($flickr_set->id) && in_array($flickr_set->id, $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr_set->id; ?>">
 									<td class="label set_image">
-										<?php if ($field['flickr_content_type'] == 'sets'): ?>
-											<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['farm'];?>.static.flickr.com/<?php echo $flickr['server'];?>/<?php echo $flickr['primary'];?>_<?php echo $flickr['secret'];?>_s.jpg">
-										<?php else: ?>
-											<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['primary_photo_farm'];?>.static.flickr.com/<?php echo $flickr['primary_photo_server'];?>/<?php echo $flickr['primary_photo_id'];?>_<?php echo $flickr['primary_photo_secret'];?>_s.jpg">
-										<?php endif; ?>
+										<img src="<?php echo $flickr_set->primary_photo_extras->url_sq; ?>" alt="<?php echo $flickr_set->title->_content;?>"/>
 									</td>
 									<td class="set_info">
-										<p class="set_title"><?php echo $flickr['title'];?></p>
-										<p class="description"><?php echo $flickr['description'];?></p>
+										<p class="set_title"><?php echo $flickr_set->title->_content;?></p>
+										<p class="description"><?php echo $flickr_set->description->_content;?></p>
 										<p class="meta_data">
-											<?php _e('Added on');?> <?php echo date_i18n(get_option('date_format') ,$flickr['date_create']); echo ' &nbsp;|&nbsp; ';
-											echo $flickr['count_views'];?> <?php _e('views on Flickr');
+											<?php _e('Added on');?> <?php echo date_i18n(get_option('date_format') ,$flickr_set->date_create); echo ' &nbsp;|&nbsp; ';
+											echo $flickr_set->count_views;?> <?php _e('views on Flickr');
 											echo ' &nbsp;|&nbsp; ';
-											echo $flickr['photos'];?> <?php _e('Photos');
-											if ($flickr['videos'] != 0) {
-												echo ' &nbsp;|&nbsp; '. $flickr['videos'] .' ';
+											echo $flickr_set->photos;?> <?php _e('Photos');
+											if ($flickr_set->videos != 0) {
+												echo ' &nbsp;|&nbsp; '. $flickr_set->videos .' ';
 												_e('Videos');
 											} ?>
 										</p>
@@ -375,42 +374,44 @@ class acf_field_flickr extends acf_field {
 					$flickr_data = $f->people_getPhotos($field['flickr_user_id'], array('privacy_filter' => 5, 'per_page' => $field['flickr_sets_amount']) );
 				}
 				else {
-					$flickr_data = $f->people_getPublicPhotos ($field['flickr_user_id'], NULL, 'url_o', $field['flickr_sets_amount'], '');
+					$response = file_get_contents("https://api.flickr.com/services/rest/?method=flickr.people.getPublicPhotos&api_key={$field['flickr_api_key']}&user_id={$field['flickr_user_id']}&extras=url_sq%2Curl_o&per_page={$field['flickr_sets_amount']}&format=json&nojsoncallback=1");
+          if($response) {
+            $flickr_data = json_decode($response);
+          }
 				}
-				if (is_array($flickr_data['photos']) && isset($flickr_data['photos']['photo'][0])):  ?>
-					<ul class="field_label photostream">
-						<?php foreach($flickr_data['photos']['photo'] as $key => $photo): ?>
-							<?php
-							$active = '';
-							if (is_array($items)) {
-								foreach ($items as $k => $item) {
-									$item = get_object_vars($item);
-									if(is_array($item) && in_array($photo['id'], $item)) {
-										$active = ' active-row';
-									}
-								}
-							}
-							?>
-							<li class="label flickr_row photo_image<?php echo $active; ?>"
-								data-flickr-id="<?php echo $photo['id']; ?>"
-								data-flickr-server="<?php echo $photo['server']; ?>"
-								data-flickr-secret="<?php echo $photo['secret']; ?>"
-								data-flickr-farm="<?php echo $photo['farm']; ?>"
-								data-flickr-title="<?php echo $photo['title']; ?>"
-								data-flickr-original-url="<?php echo $photo['url_o']; ?>"
-								>
-								<img title="<?php echo $photo['title'];?>" src="<?php echo $f->buildPhotoURL($photo, 'square'); ?>">
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				<?php else: ?>
-					<p><?php _e('There is no Flickr data available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with api key'); ?> <?php echo $field['flickr_api_key']; ?></p>
-				<?php
-				endif;
+				if (isset($flickr_data) && is_object($flickr_data->photos) && isset($flickr_data->photos->photo[0])):  ?>
+          <ul class="field_label photostream">
+            <?php foreach($flickr_data->photos->photo as $key => $photo): ?>
+              <?php
+              $active = '';
+              if (is_array($items)) {
+                foreach ($items as $k => $item) {
+                  $item = get_object_vars($item);
+                  if(is_array($item) && in_array($photo->id, $item)) {
+                    $active = ' active-row';
+                  }
+                }
+              }
+              ?>
+              <li class="label flickr_row photo_image<?php echo $active; ?>"
+                data-flickr-id="<?php echo $photo->id; ?>"
+                data-flickr-server="<?php echo $photo->server; ?>"
+                data-flickr-secret="<?php echo $photo->secret; ?>"
+                data-flickr-farm="<?php echo $photo->farm; ?>"
+                data-flickr-title="<?php echo $photo->title; ?>"
+                data-flickr-original-url="<?php echo $photo->url_o; ?>"
+                >
+                <img title="<?php echo $photo->title;?>" src="<?php  echo $photo->url_sq; ?>">
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        <?php else: ?>
+          <p><?php _e('There is no Flickr data available for user ID'); ?> <?php echo $field['flickr_user_id']; ?> <?php _e('or there is a problem with api key'); ?> <?php echo $field['flickr_api_key']; ?></p>
+        <?php
+        endif;
 			}
 			?>
 		</div>
-
 		<?php
 		if (!empty($sets['photoset'])) {
 			foreach($sets['photoset'] as $set_key => $set) {
@@ -726,22 +727,26 @@ class acf_field_flickr extends acf_field {
 				$sets = array();
 				foreach($value['items'] as $id) {
 					if ($value['type'] == 'sets') {
+						$name = 'photoset';
 						$privacy_filter = $value['private_mode'] == true ? 5 : 1;
 
-						$photos = $f->photosets_getPhotos($id, 'url_o', $privacy_filter, $value['flickr_show_limit']);
-
-						$name = 'photoset';
+						$response = file_get_contents("https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key={$field['flickr_api_key']}&photoset_id={$id}&user_id={$field['flickr_user_id']}&extras=url_sq%2Curl_o&per_page={$field['flickr_sets_amount']}&privacy_filter={$privacy_filter}&format=json&nojsoncallback=1");
 					}
 					elseif ($value['type'] == 'galleries') {
-						$photos = $f->galleries_getPhotos($id, 'url_o', $value['flickr_show_limit']);
 						$name = 'photos';
+						$photos = $f->galleries_getPhotos($id, 'url_o', $value['flickr_show_limit']);
 					}
+					if($response) {
+	          $photos = json_decode($response);
+	        }
 					// Loop through all photos and create a thumb and large url
-					foreach ($photos[$name]['photo'] as $photo) {
-						$sets[$id][$photo['id']]['title']    = $photo['title'];
-						$sets[$id][$photo['id']]['thumb']    = $f->buildPhotoURL($photo, $value['thumb_size']);
-						$sets[$id][$photo['id']]['large']    = ($value['large_size'] == 'original') ? $photo['url_o'] : $f->buildPhotoURL($photo, $value['large_size']);
-						$sets[$id][$photo['id']]['photo_id'] = $photo['id'];
+					foreach ($photos->{$name}->photo as $photo) {
+						$sets[$id][$photo->id] = array(
+							'title'    => $photo->title,
+							'thumb'    => $f->buildPhotoURL($photo, $value['thumb_size']),
+							'large'    =>  ($value['large_size'] == 'original') ? $photo['url_o'] : $f->buildPhotoURL($photo, $value['large_size']),
+							'photo_id' => $photo->id,
+						);
 					}
 				}
 				$value['items'] = $sets;
