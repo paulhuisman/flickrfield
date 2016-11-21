@@ -1,0 +1,14 @@
+{
+    "name": "paulhuisman/flickrfield",
+    "description": "Flickr field for ACF",
+    "license": "GPLv2 or later",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Paul Huisman",
+            "email": "paul@hoppinger.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
