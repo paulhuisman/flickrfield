@@ -1,17 +1,20 @@
 <?php
-/* phpFlickr Class 3.1
+/* phpFlickr
  * Written by Dan Coulter (dan@dancoulter.com)
- * Project Home Page: https://phpflickr.com/
- * Released under GNU Lesser General Public License (https://www.gnu.org/copyleft/lgpl.html)
- * For more information about the class and upcoming tools and toys using it,
- * visit https://www.phpflickr.com/
+ * Project Home Page: http://github.com/dancoulter/phpflickr
  *
- *	 For installation instructions, open the README.txt file packaged with this
- *	 class. If you don't have a copy, you can see it at:
- *	 https://www.phpflickr.com/README.txt
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *	 Please submit all problems or questions to the Help Forum on my Google Code project page:
- *		 https://code.google.com/p/phpflickr/issues/list
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 if ( !class_exists('phpFlickr') ) {
@@ -55,7 +58,7 @@ if ( !class_exists('phpFlickr') ) {
 		 */
 		var $max_cache_rows = 1000;
 
-		function phpFlickr ($api_key, $secret = NULL, $die_on_error = false) {
+		function __construct ($api_key, $secret = NULL, $die_on_error = false) {
 			//The API Key must be set before any calls can be made.  You can
 			//get your own at https://www.flickr.com/services/api/misc.api_keys.html
 			$this->api_key = $api_key;
@@ -79,27 +82,30 @@ if ( !class_exists('phpFlickr') ) {
 			if ($type == 'db') {
 				if ( preg_match('|mysql://([^:]*):([^@]*)@([^/]*)/(.*)|', $connection, $matches) ) {
 					//Array ( [0] => mysql://user:password@server/database [1] => user [2] => password [3] => server [4] => database )
-					$db = mysql_connect($matches[3], $matches[1], $matches[2]);
-					mysql_select_db($matches[4], $db);
+					$db = mysqli_connect($matches[3],  $matches[1],  $matches[2]);
+					mysqli_query($db, "USE $matches[4]");
 
 					/*
 					 * If high performance is crucial, you can easily comment
 					 * out this query once you've created your database table.
 					 */
-					mysql_query("
+					mysqli_query($db, "
 						CREATE TABLE IF NOT EXISTS `$table` (
-							`request` CHAR( 35 ) NOT NULL ,
-							`response` MEDIUMTEXT NOT NULL ,
-							`expiration` DATETIME NOT NULL ,
-							INDEX ( `request` )
-						) TYPE = MYISAM
-					", $db);
+							`request` varchar(128) NOT NULL,
+							`response` mediumtext NOT NULL,
+							`expiration` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+							UNIQUE KEY `request` (`request`)
+						)
+					");
 
-					$result = mysql_query("SELECT COUNT(*) FROM $table", $db);
-					$result = mysql_fetch_row($result);
-					if ( $result[0] > $this->max_cache_rows ) {
-						mysql_query("DELETE FROM $table WHERE expiration < DATE_SUB(NOW(), INTERVAL $cache_expire second)", $db);
-						mysql_query('OPTIMIZE TABLE ' . $this->cache_table, $db);
+					$result = mysqli_query($db, "SELECT COUNT(*) 'count' FROM $table");
+					if( $result ) {
+						$result = mysqli_fetch_assoc($result);						
+					}
+					
+					if ( $result && $result['count'] > $this->max_cache_rows ) {
+						mysqli_query($db, "DELETE FROM $table WHERE CURRENT_TIMESTAMP > expiration");
+						mysqli_query($db, 'OPTIMIZE TABLE ' . $this->cache_table);
 					}
 					$this->cache = 'db';
 					$this->cache_db = $db;
@@ -129,6 +135,7 @@ if ( !class_exists('phpFlickr') ) {
 			//Checks the database or filesystem for a cached result to the request.
 			//If there is no cache result, it returns a value of false. If it finds one,
 			//it returns the unparsed XML.
+			unset($request['api_sig']);
 			foreach ( $request as $key => $value ) {
 				if ( empty($value) ) unset($request[$key]);
 				else $request[$key] = (string) $request[$key];
@@ -138,10 +145,10 @@ if ( !class_exists('phpFlickr') ) {
 			$this->cache_key = $reqhash;
 			$this->cache_request = $request;
 			if ($this->cache == 'db') {
-				$result = mysql_query("SELECT response FROM " . $this->cache_table . " WHERE request = '" . $reqhash . "' AND DATE_SUB(NOW(), INTERVAL " . (int) $this->cache_expire . " SECOND) < expiration", $this->cache_db);
-				if ( mysql_num_rows($result) ) {
-					$result = mysql_fetch_assoc($result);
-					return $result['response'];
+				$result = mysqli_query($this->cache_db, "SELECT response FROM " . $this->cache_table . " WHERE request = '" . $reqhash . "' AND CURRENT_TIMESTAMP < expiration");
+				if ( $result && mysqli_num_rows($result) ) {
+					$result = mysqli_fetch_assoc($result);
+					return urldecode($result['response']);
 				} else {
 					return false;
 				}
@@ -171,15 +178,18 @@ if ( !class_exists('phpFlickr') ) {
 			$reqhash = md5(serialize($request));
 			if ($this->cache == 'db') {
 				//$this->cache_db->query("DELETE FROM $this->cache_table WHERE request = '$reqhash'");
-				$result = mysql_query("SELECT COUNT(*) FROM " . $this->cache_table . " WHERE request = '" . $reqhash . "'", $this->cache_db);
-				$result = mysql_fetch_row($result);
-				if ( $result[0] ) {
-					$sql = "UPDATE " . $this->cache_table . " SET response = '" . str_replace("'", "''", $response) . "', expiration = '" . strftime("%Y-%m-%d %H:%M:%S") . "' WHERE request = '" . $reqhash . "'";
-					mysql_query($sql, $this->cache_db);
-				} else {
-					$sql = "INSERT INTO " . $this->cache_table . " (request, response, expiration) VALUES ('$reqhash', '" . str_replace("'", "''", $response) . "', '" . strftime("%Y-%m-%d %H:%M:%S") . "')";
-					mysql_query($sql, $this->cache_db);
+				$response = urlencode($response);
+				$sql = 'INSERT INTO '.$this->cache_table.' (request, response, expiration) 
+						VALUES (\''.$reqhash.'\', \''.$response.'\', TIMESTAMPADD(SECOND,'.$this->cache_expire.',CURRENT_TIMESTAMP))
+						ON DUPLICATE KEY UPDATE response=\''.$response.'\', 
+						expiration=TIMESTAMPADD(SECOND,'.$this->cache_expire.',CURRENT_TIMESTAMP) ';
+
+				$result = mysqli_query($this->cache_db, $sql);
+				if(!$result) {
+					echo mysqli_error($this->cache_db);
 				}
+					
+				return $result;
 			} elseif ($this->cache == "fs") {
 				$file = $this->cache_dir . "/" . $reqhash . ".cache";
 				$fstream = fopen($file, "w");
@@ -215,8 +225,6 @@ if ( !class_exists('phpFlickr') ) {
 				curl_setopt($curl, CURLOPT_POST, true);
 				curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-				curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
 				$response = curl_exec($curl);
 				curl_close($curl);
 			} else {
@@ -226,7 +234,7 @@ if ( !class_exists('phpFlickr') ) {
 				}
 				$data = implode('&', $data);
 
-				$fp = @pfsockopen($matches[1], 80);
+				$fp = @pfsockopen('ssl://'.$matches[1], 443);
 				if (!$fp) {
 					die('Could not connect to the web service');
 				}
@@ -269,7 +277,7 @@ if ( !class_exists('phpFlickr') ) {
 			}
 
 			//Process arguments, including method and login data.
-			$args = array_merge(array("method" => $command, "format" => "php_serial", "api_key" => $this->api_key), $args);
+			$args = array_merge(array("method" => $command, "format" => "json", "nojsoncallback" => "1", "api_key" => $this->api_key), $args);
 			if (!empty($this->token)) {
 				$args = array_merge($args, array("auth_token" => $this->token));
 			} elseif (!empty($_SESSION['phpFlickr_auth_token'])) {
@@ -278,7 +286,8 @@ if ( !class_exists('phpFlickr') ) {
 			ksort($args);
 			$auth_sig = "";
 			$this->last_request = $args;
-			if (!($this->response = $this->getCached($args)) || $nocache) {
+			$this->response = $this->getCached($args);
+			if (!($this->response) || $nocache) {
 				foreach ($args as $key => $data) {
 					if ( is_null($data) ) {
 						unset($args[$key]);
@@ -294,13 +303,14 @@ if ( !class_exists('phpFlickr') ) {
 				$this->cache($args, $this->response);
 			}
 
+
 			/*
 			 * Uncomment this line (and comment out the next one) if you're doing large queries
 			 * and you're concerned about time.  This will, however, change the structure of
 			 * the result, so be sure that you look at the results.
 			 */
-			//$this->parsed_response = unserialize($this->response);
-			$this->parsed_response = $this->clean_text_nodes(unserialize($this->response));
+			$this->parsed_response = json_decode($this->response, TRUE);
+/* 			$this->parsed_response = $this->clean_text_nodes(json_decode($this->response, TRUE)); */
 			if ($this->parsed_response['stat'] == 'fail') {
 				if ($this->die_on_error) die("The Flickr API returned the following error: #{$this->parsed_response['code']} - {$this->parsed_response['message']}");
 				else {
@@ -355,30 +365,26 @@ if ( !class_exists('phpFlickr') ) {
 		/* These functions are front ends for the flickr calls */
 
 		function buildPhotoURL ($photo, $size = "Medium") {
-			// check if object
-			if (is_object($photo)) {
-				$photo = get_object_vars($photo);
-			}
 			//receives an array (can use the individual photo data returned
 			//from an API call) and returns a URL (doesn't mean that the
 			//file size exists)
 			$sizes = array(
-			  "square" => "_s",
-        "square_75" => "_s",
-        "square_150" => "_q",
-        "thumbnail" => "_t",
-        "small" => "_m",
-        "small_240" => "_m",
-        "small_320" => "_n",
-        "medium" => "",
-        "medium_500" => "",
-        "medium_640" => "_z",
-        "medium_800" => "_c",
-        "large" => "_b",
-        "large_1024" => "_b",
-        "large_1600" => "_h",
-        "large_2048" => "_k",
-        "original" => "_o",
+				"square" => "_s",
+				"square_75" => "_s",
+				"square_150" => "_q",
+				"thumbnail" => "_t",
+				"small" => "_m",
+				"small_240" => "_m",
+				"small_320" => "_n",
+				"medium" => "",
+				"medium_500" => "",
+				"medium_640" => "_z",
+				"medium_800" => "_c",
+				"large" => "_b",
+				"large_1024" => "_b",
+				"large_1600" => "_h",
+				"large_2048" => "_k",
+				"original" => "_o",
 			);
 
 			$size = strtolower($size);
@@ -386,17 +392,12 @@ if ( !class_exists('phpFlickr') ) {
 				$size = "medium";
 			}
 
-			$url = "https://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['secret'] . $sizes[$size] . ".jpg";
-
+			if ($size == "original") {
+				$url = "https://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['originalsecret'] . "_o" . "." . $photo['originalformat'];
+			} else {
+				$url = "https://farm" . $photo['farm'] . ".static.flickr.com/" . $photo['server'] . "/" . $photo['id'] . "_" . $photo['secret'] . $sizes[$size] . ".jpg";
+			}
 			return $url;
-		}
-
-		function getFriendlyGeodata ($lat, $lon) {
-			/* I've added this method to get the friendly geodata (i.e. 'in New York, NY') that the
-			 * website provides, but isn't available in the API. I'm providing this service as long
-			 * as it doesn't flood my server with requests and crash it all the time.
-			 */
-			return unserialize(file_get_contents('https://phpflickr.com/geodata/?format=php&lat=' . $lat . '&lon=' . $lon));
 		}
 
 		function sync_upload ($photo, $title = null, $description = null, $tags = null, $is_public = null, $is_friend = null, $is_family = null) {
@@ -433,8 +434,6 @@ if ( !class_exists('phpFlickr') ) {
 				curl_setopt($curl, CURLOPT_POST, true);
 				curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
 				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-				curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
 				$response = curl_exec($curl);
 				$this->response = $response;
 				curl_close($curl);
@@ -503,7 +502,7 @@ if ( !class_exists('phpFlickr') ) {
 
 				$rsp = explode("\n", $response);
 				foreach ($rsp as $line) {
-					if (ereg('<err code="([0-9]+)" msg="(.*)"', $line, $match)) {
+					if (preg_match('/<err code="([0-9]+)" msg="(.*)"/', $line, $match)) {
 						if ($this->die_on_error)
 							die("The Flickr API returned the following error: #{$match[1]} - {$match[2]}");
 						else {
@@ -512,7 +511,7 @@ if ( !class_exists('phpFlickr') ) {
 							$this->parsed_response = false;
 							return false;
 						}
-					} elseif (ereg("<ticketid>(.*)</", $line, $match)) {
+					} elseif (preg_match("/<ticketid>(.*)</", $line, $match)) {
 						$this->error_code = false;
 						$this->error_msg = false;
 						return $match[1];
@@ -603,7 +602,7 @@ if ( !class_exists('phpFlickr') ) {
 				$api_sig = md5($this->secret . "api_key" . $this->api_key . "perms" . $perms);
 
 				if ($this->service == "23") {
-					header("Location: https://www.23hq.com/services/auth/?api_key=" . $this->api_key . "&perms=" . $perms . "&api_sig=". $api_sig);
+					header("Location: http://www.23hq.com/services/auth/?api_key=" . $this->api_key . "&perms=" . $perms . "&api_sig=". $api_sig);
 				} else {
 					header("Location: https://www.flickr.com/services/auth/?api_key=" . $this->api_key . "&perms=" . $perms . "&api_sig=". $api_sig);
 				}
@@ -619,6 +618,11 @@ if ( !class_exists('phpFlickr') ) {
 				$this->die_on_error = $tmp;
 				return $rsp['perms'];
 			}
+		}
+
+		function auth_url($frob, $perms = 'read') {
+			$sig = md5(sprintf('%sapi_key%sfrob%sperms%s', $this->secret, $this->api_key, $frob, $perms));
+			return sprintf('https://flickr.com/services/auth/?api_key=%s&perms=%s&frob=%s&api_sig=%s', $this->api_key, $perms, $frob, $sig);
 		}
 
 		/*******************************
@@ -1102,8 +1106,8 @@ if ( !class_exists('phpFlickr') ) {
 			 */
 
 			/* https://www.flickr.com/services/api/flickr.photos.search.html */
-			$this->request("flickr.photos.search", $args);
-			return $this->parsed_response ? $this->parsed_response['photos'] : false;
+			$result = $this->request("flickr.photos.search", $args);
+			return ($this->parsed_response) ? $this->parsed_response['photos'] : false;
 		}
 
 		function photos_setContentType ($photo_id, $content_type) {
@@ -1336,9 +1340,9 @@ if ( !class_exists('phpFlickr') ) {
 			return $this->parsed_response ? $this->parsed_response['photoset'] : false;
 		}
 
-		function photosets_getList ($user_id = NULL, $per_page = NULL, $page = NULL ) {
+		function photosets_getList ($user_id = NULL, $page = NULL, $per_page = NULL, $primary_photo_extras = NULL) {
 			/* https://www.flickr.com/services/api/flickr.photosets.getList.html */
-			$this->request("flickr.photosets.getList", array("user_id" => $user_id, 'per_page' => $per_page, 'page' => $page, ));
+			$this->request("flickr.photosets.getList", array("user_id" => $user_id, 'page' => $page, 'per_page' => $per_page, 'primary_photo_extras' => $primary_photo_extras));
 			return $this->parsed_response ? $this->parsed_response['photosets'] : false;
 		}
 
@@ -1700,7 +1704,7 @@ if ( !class_exists('phpFlickr_pager') ) {
 		var $total = null, $page = 0, $pages = null, $photos, $_extra = null;
 
 
-		function phpFlickr_pager($phpFlickr, $method = null, $args = null, $per_page = 30) {
+		function __construct($phpFlickr, $method = null, $args = null, $per_page = 30) {
 			$this->per_page = $per_page;
 			$this->method = $method;
 			$this->args = $args;
