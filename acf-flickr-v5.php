@@ -130,12 +130,12 @@ class acf_field_flickr extends acf_field {
 
 		acf_render_field_setting( $field, array(
 			'label'			=> __('Type of content','acf-flickr'),
-			'instructions'	=> __('Do you want to be able to select photos from the photostream or use sets/galleries that have already been created on Flickr?','acf-flickr'),
+			'instructions'	=> __('Select your type of content from Flickr (sets are temporarily disabled).','acf-flickr'),
 			'type'			=> 'select',
 			'name'			=> 'flickr_content_type',
 			'choices' 	=> array(
-				'sets'        => 'Sets',
-				'galleries'   => 'Galleries',
+				//'sets'        => 'Sets',
+				//'galleries'   => 'Galleries',
 				'photostream' => 'Photostream',
 			),
 		));
