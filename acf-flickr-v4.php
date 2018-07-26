@@ -183,7 +183,7 @@ class acf_field_flickr extends acf_field {
 		<tr class="field_option field_option_<?php echo $this->name; ?>">
 			<td class="label">
 				<label><?php _e( 'Type of content', 'acf-flickr' );?></label>
-				<p class="description"><?php _e('Do you want to be able to select photos from the photostream or use sets/galleries that have already been created on Flickr?', 'acf-flickr');?></p>
+				<p class="description"><?php _e('Do you want to be able to select photos from the photostream or use sets that have already been created on Flickr?', 'acf-flickr');?></p>
 			</td>
 			<td>
 				<?php
@@ -193,7 +193,7 @@ class acf_field_flickr extends acf_field {
 					'value'	=>	$field['flickr_content_type'],
 					'choices' => array(
 						'sets'        => 'Sets',
-						'galleries'   => 'Galleries',
+						//'galleries'   => 'Galleries',
 						'photostream' => 'Photostream',
 					),
 				));
@@ -437,44 +437,34 @@ class acf_field_flickr extends acf_field {
 
 			// Check for three types of Flickr content; Sets, Galleries and Photostream
 			if ($field['flickr_content_type'] == 'sets' || $field['flickr_content_type'] == 'galleries') {
+				
 				if ($field['flickr_content_type'] == 'sets') {
-					$flickr_data = $f->photosets_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
-				}
-				elseif ($field['flickr_content_type'] == 'galleries') {
-					$flickr_data = $f->galleries_getList($field['flickr_user_id'], $field['flickr_sets_amount'], 1);
+					$flickr_api_request  = 'https://api.flickr.com/services/rest/?method=flickr.photosets.getList&api_key=' . $field['flickr_api_key'] . '&user_id=' . $field['flickr_user_id'] . '&format=json&nojsoncallback=1';
+					$flickr_api_response = wp_remote_get( $flickr_api_request );
+					$flickr_data = json_decode(wp_remote_retrieve_body( $flickr_api_response ));
 				}
 				?>
 
 				<table class="acf_input widefat acf_field_form_table">
 					<tbody>
 						<?php
-						if (is_array($flickr_data) && (!empty($flickr_data['photoset']) || !empty($flickr_data['galleries']['gallery']))) {
-							if ($field['flickr_content_type'] == 'sets') {
-								$data = $flickr_data['photoset'];
-							}
-							elseif ($field['flickr_content_type'] == 'galleries') {
-								$data = $flickr_data['galleries']['gallery'];
-							}
-							foreach($data as $key => $flickr) {
+						if (!empty($flickr_data)) {
+							foreach($flickr_data->photosets->photoset as $key => $flickr) {
 								?>
-								<tr class="field_label flickr_row <?php if (isset($flickr['id']) && in_array($flickr['id'], $items)) echo 'active-row'; ?>" data-flickr-id="<?php echo $flickr['id']; ?>">
+								<tr class="field_label flickr_row <?php echo (isset($flickr->id) && in_array($flickr->id, $items)) ? 'active-row' : ''; ?>" data-flickr-id="<?php echo $flickr->id; ?>">
 									<td class="label set_image">
-										<?php if ($field['flickr_content_type'] == 'sets'): ?>
-											<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['farm'];?>.static.flickr.com/<?php echo $flickr['server'];?>/<?php echo $flickr['primary'];?>_<?php echo $flickr['secret'];?>_s.jpg">
-										<?php else: ?>
-											<img title="<?php echo $flickr['title'];?>" src="http://farm<?php echo $flickr['primary_photo_farm'];?>.static.flickr.com/<?php echo $flickr['primary_photo_server'];?>/<?php echo $flickr['primary_photo_id'];?>_<?php echo $flickr['primary_photo_secret'];?>_s.jpg">
-										<?php endif; ?>
+										<img title="<?php echo $flickr->title_content; ?>" src="http://farm<?php echo $flickr->farm; ?>.static.flickr.com/<?php echo $flickr->server; ?>/<?php echo $flickr->primary; ?>_<?php echo $flickr->secret; ?>_s.jpg" />
 									</td>
 									<td class="set_info">
-										<p class="set_title"><?php echo $flickr['title'];?></p>
-										<p class="description"><?php echo $flickr['description'];?></p>
+										<p class="set_title"><?php echo $flickr->title->_content; ?></p>
+										<p class="description"><?php echo $flickr->description->_content; ?></p>
 										<p class="meta_data">
-											<?php _e('Added on');?> <?php echo date_i18n(get_option('date_format') ,$flickr['date_create']); echo ' &nbsp;|&nbsp; ';
-											echo $flickr['count_views'];?> <?php _e('views on Flickr');
+											<?php _e('Added on'); ?> <?php echo date_i18n(get_option('date_format'), $flickr->date_create); echo ' &nbsp;|&nbsp; ';
+											echo $flickr->count_views; ?> <?php _e('views on Flickr');
 											echo ' &nbsp;|&nbsp; ';
-											echo $flickr['photos'];?> <?php _e('Photos');
-											if ($flickr['videos'] != 0) {
-												echo ' &nbsp;|&nbsp; '. $flickr['videos'] .' ';
+											echo $flickr->photos; ?> <?php _e('Photos');
+											if ($flickr->videos != 0) {
+												echo ' &nbsp;|&nbsp; '. $flickr->videos .' ';
 												_e('Videos');
 											} ?>
 										</p>
