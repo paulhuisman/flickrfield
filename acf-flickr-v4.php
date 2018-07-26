@@ -498,7 +498,7 @@ class acf_field_flickr extends acf_field {
 							$active = '';
 							if (is_array($items)) {
 								foreach ($items as $k => $item) {
-									if (is_object($item)) {
+									if(!is_string($item)) {
 										$item = get_object_vars($item);
 										if(is_array($item) && in_array($photo['id'], $item)) {
 											$active = ' active-row';
