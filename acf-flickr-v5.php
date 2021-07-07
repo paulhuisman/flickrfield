@@ -733,6 +733,7 @@ class acf_field_flickr extends acf_field {
 						$sets[$id][$photo['id']]['thumb']    = $f->buildPhotoURL($photo, $value['thumb_size']);
 						$sets[$id][$photo['id']]['large']    = ($value['large_size'] == 'original') ? $photo['url_o'] : $f->buildPhotoURL($photo, $value['large_size']);
 						$sets[$id][$photo['id']]['photo_id'] = $photo['id'];
+						$sets[$id][$photo['id']]['isprimary'] = (isset($photo['isprimary'])) ? $photo['isprimary'] : 0;
 					}
 				}
 				$value['items'] = $sets;
